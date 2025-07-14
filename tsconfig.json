@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@badeball/cypress-cucumber-preprocessor/*": ["./node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "module": "nodenext",
+    "target": "es2021",
+    "lib": ["es2021", "dom"],
+    "sourceMap": true,
+    "types": ["cypress", "node"],
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true 
+  },
+  "include": ["**/*.ts"],
+  
+}
