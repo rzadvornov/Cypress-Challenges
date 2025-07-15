@@ -47,7 +47,7 @@ class LoginPage extends BasePage {
     this.#setValidPasswordFromPage();
   }
   
-  fillUsername(value) {
+  fillUsername(value: string) {
     const field = cy.get(`#username`);
     field.clear();
     field.type(value);
@@ -55,7 +55,7 @@ class LoginPage extends BasePage {
     return this;
   }
 
-  fillPassword(value) {
+  fillPassword(value: string) {
     const field = cy.get(`#password`);
     field.clear();
     field.type(value);

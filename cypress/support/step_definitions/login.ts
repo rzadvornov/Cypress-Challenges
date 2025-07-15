@@ -19,11 +19,11 @@ Given("the user enters valid password", () => {
   loginPage.fillPassword(loginPage.getPassword());
 });
 
-Given("the user enters username {string}", (username) => {
+Given("the user enters username {string}", (username: string) => {
   loginPage.fillUsername(username);
 });
 
-Given("the user enters password {string}", (password) => {
+Given("the user enters password {string}", (password: string) => {
   loginPage.fillPassword(password);
 });
 
