@@ -11,8 +11,9 @@
     "sourceMap": true,
     "types": ["cypress", "node"],
     "moduleResolution": "nodenext",
+    "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true 
   },
   "include": ["**/*.ts"],
-  
+  "exclude": ["node_modules"]
 }

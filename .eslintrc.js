@@ -22,7 +22,8 @@ export default tseslint.config(
     ],
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'off', 
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-member-accessibility': 'error',
     },
   },
   {
@@ -50,7 +51,7 @@ export default tseslint.config(
       'array-bracket-spacing': ['error', 'never'],
       'object-bracket-spacing': ['error', 'always'],
       'comma-spacing': ['error', {'before': false, 'after': true }],
-      'no-multiply-empty-lines': ['error', { 'max': 1, 'maxEOF': 1 }],
+      'no-multiply-empty-lines': ['error', { 'max': 1, 'maxEOF': 1 }],      
     },
   }
 );

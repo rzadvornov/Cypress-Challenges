@@ -48,3 +48,5 @@ Then("the username field should be cleared", () => {
 Then("the password field should be cleared", () => {
   loginPage.verifyEmptyPassword();
 });
+
+Then("I should be redirected to the 'Login' page", verifyLoginPage);

@@ -1,4 +1,8 @@
 Feature: User Login Authentication
+  As a registered user
+  I want to login to my account
+  So that I can access protected features with proper validation
+
   Background:
     Given the user is on the Login page
     And the login form is displayed
