@@ -3,8 +3,7 @@ import { BasePage } from "./BasePage";
 class RegistrationPage extends BasePage {
 
   clearUsername() {
-    const field = cy.get(`#username`);
-    field.clear();
+    cy.get(`#username`).clear();
   }
 
   fillPasswordConfirmation(value: string) {

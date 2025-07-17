@@ -7,4 +7,8 @@ export class StringUtils {
     ).join('');
   }
   
+  static getCurrentDateStringISOFormat() {
+    const currentDate = new Date();
+    return currentDate.toISOString().split('T')[0];
+  }
 }

@@ -11,7 +11,7 @@ When("the user clicks Logout button", () => {
 });
 
 Then("the user should be redirected to the dashboard page", () => {
-  dashboardPage.verifyPageUrl();
+  dashboardPage.verifyPageLoaded();
 }); 
 
 Then("the user should see greeting message", () => {

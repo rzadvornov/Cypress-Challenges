@@ -8,7 +8,7 @@ const CONFIG = {
 
 class DashboardPage extends BasePage {
   
-  verifyPageUrl() {
+  verifyPageLoaded() {
     cy.url().should('eq', `${Cypress.config().baseUrl}/secure`);
   }
 
