@@ -1,22 +1,16 @@
 import { BasePage } from "./BasePage";
+import { Singleton } from "../../../support/utilities/Decorators";
 
+@Singleton
 class LoginPage extends BasePage {
   
-  private static instance: LoginPage;
   #username: string;
   #password: string;
   
-  private constructor(username: string, password: string) {
+   constructor(username: string, password: string) {
     super();
     this.#username = username;
     this.#password = password;
-  }
-
-  public static getInstance(): LoginPage {
-    if (!LoginPage.instance) {
-      LoginPage.instance = new LoginPage("", "");
-    }
-    return LoginPage.instance;
   }
 
   #setValidUsernameFromPage() {
@@ -67,4 +61,4 @@ class LoginPage extends BasePage {
   }
 }
 
-export const loginPage = LoginPage.getInstance();
+export const loginPage = new LoginPage("", "");

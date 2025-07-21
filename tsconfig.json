@@ -12,7 +12,9 @@
     "types": ["cypress", "node"],
     "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true 
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true 
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
