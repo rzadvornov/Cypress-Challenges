@@ -8,6 +8,14 @@ export default defineConfig({
     baseUrl: 'https://practice.expandtesting.com',
     specPattern: "**/*.feature",
     experimentalRunAllSpecs: true,
+    video: true,
+    screenshotOnRunFailure: true,
+    testIsolation: true,
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
+    chromeWebSecurity: false,
+    
     async setupNodeEvents(
         on: Cypress.PluginEvents,
         config: Cypress.PluginConfigOptions
@@ -20,6 +28,37 @@ export default defineConfig({
             plugins: [createEsbuildPlugin(config)],
           })
         );
+        
+        on('task', {
+        createTestFile({ size, filename }) {
+          const fs = require('fs');
+          const path = require('path');
+          
+          const content = 'x'.repeat(size * 1024); // size in KB
+          const filePath = path.join(__dirname, 'cypress/fixtures', filename);
+          
+          fs.writeFileSync(filePath, content);
+          return filePath;
+          },
+          
+          cleanupTestFiles() {
+          const fs = require('fs');
+          const path = require('path');
+          const fixturesDir = path.join(__dirname, 'cypress/fixtures');
+          
+          try {
+            const files = fs.readdirSync(fixturesDir);
+            files.forEach((file: string) => {
+              if (file.startsWith('test-') || file.startsWith('temp-')) {
+                fs.unlinkSync(path.join(fixturesDir, file));
+              }
+            });
+            return 'Cleanup completed';
+          } catch (error: unknown) {
+              return error instanceof Error ? `Cleanup error: ${error.message}` : "An unexpected error occurred.";
+            }
+          }
+        });
 
         // Browser launch configuration
         on('before:browser:launch', (browser = {
