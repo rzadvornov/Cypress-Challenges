@@ -15,6 +15,7 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     chromeWebSecurity: false,
+    includeShadowDom: true,
     
     async setupNodeEvents(
         on: Cypress.PluginEvents,

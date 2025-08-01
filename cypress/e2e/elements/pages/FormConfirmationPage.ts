@@ -8,8 +8,8 @@ class FormConfirmationPage extends BasePage {
 
   verifyAlertMessage() {
     const alert = cy.get(`.alert`);
-    alert.should('have.css', 'background-color', 'rgb(207, 244, 252)');
-    alert.contains('Thank you for validating your ticket');
+    alert.should('have.css', 'background-color', 'rgb(207, 244, 252)')
+         .contains('Thank you for validating your ticket');
   }
 }
 

@@ -37,6 +37,9 @@ npm i @bahmutov/cypress-esbuild-preprocessor
 # Install linter and config
 npm install --save-dev eslint @eslint/js typescript typescript-eslint
 npm i eslint-config-airbnb-typescript
+
+# Install cypress plugins
+npm install --save-dev @4tw/cypress-drag-drop
 ```
 
 ### 2. Initialize Cypress
