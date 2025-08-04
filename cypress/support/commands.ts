@@ -125,17 +125,23 @@ Cypress.Commands.add('getShadowElementByPiercing', (selector) => {
  * @returns {Chainable} Cypress chainable object
  */
 Cypress.Commands.add('getNestedShadowElement', (selectors) => {
-  let chain = cy.get(selectors[0]);
-  
-  for (let i = 1; i < selectors.length; i++) {
-    if (i === 1) {
-      chain = chain.shadow().find(selectors[i]);
-    } else {
-      chain = chain.shadow().find(selectors[i]);
-    }
+  if (!Array.isArray(selectors)) {
+    throw new Error('Expected selectors to be an array');
   }
   
-  return chain;
+  if (selectors.length === 0) {
+    throw new Error('selectors array cannot be empty');
+  }
+  
+  if (selectors.length === 1) {
+    // No shadow DOM traversal needed
+    return cy.get(selectors[0]);
+  }
+  
+  // Start with the host element
+  return selectors.slice(1).reduce((chain, selector) => {
+    return chain.shadow().find(selector);
+  }, cy.get(selectors[0]));
 });
 
 /**
