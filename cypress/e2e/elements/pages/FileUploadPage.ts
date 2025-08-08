@@ -2,12 +2,20 @@ import { BasePage } from "./BasePage";
 
 class FileUploadPage extends BasePage {
   
+  protected fileUploadElements = {
+    fileInput: () => cy.get('#fileInput'),
+    fileSubmit: () => cy.get('#fileSubmit'),
+    warningMessage: () => cy.get('#core >> div:has(> h1)> p'),
+    uploadedFiles: () => cy.get('#uploaded-files'),
+    pageHeader: () => cy.get('h1')
+  };
+
   submit() {
-    cy.get(`#fileSubmit`).click();
+    this.fileUploadElements.fileSubmit().click();
   }
 
   selectFile(path: string) {
-    cy.get(`#fileInput`).selectFile(path);
+    this.fileUploadElements.fileInput().selectFile(path);
   }
 
   visit() {
@@ -15,27 +23,40 @@ class FileUploadPage extends BasePage {
   }
 
   verifyPageLoaded() {
-    cy.shouldExistAndBeVisible(`#core >> div:has(> h1)> p`)
+    this.fileUploadElements.warningMessage()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(255, 193, 7)')
       .contains('Only a file less than 500KB will be accepted.');
-    cy.shouldExistAndBeVisible(`#fileSubmit`)
+    
+    this.fileUploadElements.fileSubmit()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(13, 110, 253)');
+    
     this.verifyFileInput();
   }
 
   verifyFileInput() {
-    cy.shouldExistAndBeVisible(`#fileInput`);
+    this.fileUploadElements.fileInput()
+      .should('exist')
+      .and('be.visible');
   }
 
   verifyFileUploaded(fileName: string) {
     this.verifyFileUploadHeader();
-    cy.shouldExistAndBeVisible(`#uploaded-files`)
+    this.fileUploadElements.uploadedFiles()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(207, 244, 252)')
       .contains(fileName);
   }
 
   verifyFileUploadHeader() {
-    cy.shouldExistAndBeVisible(`h1`).contains('File Uploaded!');
+    this.fileUploadElements.pageHeader()
+      .should('exist')
+      .and('be.visible')
+      .contains('File Uploaded!');
   }
 
   verifyFileValidationError() {

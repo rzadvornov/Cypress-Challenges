@@ -8,12 +8,20 @@ const CONFIG = {
 
 class DashboardPage extends BasePage {
   
+  protected dashboardElements = {
+    greetingMessage: () => cy.get('#username'), 
+    coreContainer: () => cy.get('#core'),
+    logoutLink: () => cy.get('#core').find('a[href="/logout"]')
+  };
+
   verifyPageLoaded() {
     cy.url().should('eq', `${Cypress.config().baseUrl}/secure`);
   }
 
   verifyGreetingMessage(userName: string) {
-    cy.get(`#username`).contains(`Hi, ${userName}!`).should('have.attr', 'style', 'color: blue;');
+    this.dashboardElements.greetingMessage()
+      .contains(`Hi, ${userName}!`)
+      .should('have.attr', 'style', 'color: blue;');
   }
 
   verifyUserSession() {
@@ -29,7 +37,7 @@ class DashboardPage extends BasePage {
   }
 
   signOut() {
-    cy.get(`#core`).find(`a[href='/logout']`).click();
+    this.dashboardElements.logoutLink().click();
   }
 }
 

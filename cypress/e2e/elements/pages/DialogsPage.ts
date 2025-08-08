@@ -2,16 +2,23 @@ import { BasePage } from "./BasePage";
 
 class DialogsPage extends BasePage {
   
+  protected dialogElements = {
+    jsAlertButton: () => cy.get('#js-alert'),
+    jsConfirmButton: () => cy.get('#js-confirm'),
+    jsPromptButton: () => cy.get('#js-prompt'),
+    dialogResponse: () => cy.get('#dialog-response')
+  };
+
   clickJsAlertButton() {
-    cy.get(`#js-alert`).click();
+    this.dialogElements.jsAlertButton().click();
   }
 
   clickJsConfirmButton() {
-    cy.get(`#js-confirm`).click();
+    this.dialogElements.jsConfirmButton().click();
   }
 
   clickJsPromptButton() {
-    cy.get(`#js-prompt`).click();
+    this.dialogElements.jsPromptButton().click();
   }
   
   setupJsAlertHanding() {
@@ -39,10 +46,10 @@ class DialogsPage extends BasePage {
   }
 
   verifyDialogResponse(response: string) {
-    response ? cy.get(`#dialog-response`)
+    response ? this.dialogElements.dialogResponse()
                   .should('have.css', 'color', 'rgb(0, 128, 0)')
                   .contains(response)
-              : cy.get(`#dialog-response`)
+              : this.dialogElements.dialogResponse()
                   .should('have.css', 'color', 'rgb(0, 128, 0)')
                   .and('be.empty');
   }
@@ -52,18 +59,26 @@ class DialogsPage extends BasePage {
   }
 
   verifyPageLoaded(): void {
-    cy.shouldExistAndBeVisible(`#js-alert`)
+    this.dialogElements.jsAlertButton()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(13, 110, 253)')
       .contains('Js Alert');
-    cy.shouldExistAndBeVisible(`#js-confirm`)
+    
+    this.dialogElements.jsConfirmButton()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(13, 110, 253)')
       .contains('Js Confirm');
-    cy.shouldExistAndBeVisible(`#js-prompt`)
+    
+    this.dialogElements.jsPromptButton()
+      .should('exist')
+      .and('be.visible')
       .and('have.css', 'background-color', 'rgb(13, 110, 253)')
       .contains('Js Prompt');
+    
     this.verifyDialogResponse('Waiting');
   }
-
 }
 
 export const dialogsPage = new DialogsPage();

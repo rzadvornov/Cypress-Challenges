@@ -1,13 +1,18 @@
 import { BasePage } from "./BasePage";
 
 class RegistrationPage extends BasePage {
+  
+  protected registrationElements = {
+    confirmPasswordField: () => cy.get('#confirmPassword'),
+    submitButton: () => cy.get('#register > button')
+  };
 
   clearUsername() {
-    cy.get(`#username`).clear();
+    this.elements.username().clear();
   }
 
   fillPasswordConfirmation(value: string) {
-    const field = cy.get(`#confirmPassword`);
+    const field = this.registrationElements.confirmPasswordField();
     field.clear();
     field.type(value);
     
@@ -15,7 +20,7 @@ class RegistrationPage extends BasePage {
   }
 
   submit() {
-    cy.get(`#register > button`).click();
+    this.registrationElements.submitButton().click();
   }
 
   visit() {
@@ -24,12 +29,23 @@ class RegistrationPage extends BasePage {
 
   verifyPageLoaded() {
     cy.url().should('eq', `${Cypress.config().baseUrl}/register`);
-    cy.shouldExistAndBeVisible('#username');
-    cy.shouldExistAndBeVisible('#password');
-    cy.shouldExistAndBeVisible('#confirmPassword');
-    cy.shouldExistAndBeVisible('#register > button');
+    
+    this.elements.username()
+      .should('exist')
+      .and('be.visible');
+    
+    this.elements.password()
+      .should('exist')
+      .and('be.visible');
+    
+    this.registrationElements.confirmPasswordField()
+      .should('exist')
+      .and('be.visible');
+    
+    this.registrationElements.submitButton()
+      .should('exist')
+      .and('be.visible');
   }
-
-};
+}
 
 export const registrationPage = new RegistrationPage();

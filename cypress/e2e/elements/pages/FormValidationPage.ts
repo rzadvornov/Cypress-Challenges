@@ -2,12 +2,26 @@ import { BasePage } from "./BasePage";
 
 class FormValidationPage extends BasePage {
   
+  protected validationElements = {
+    contactNameField: () => cy.get('#validationCustom01'),
+    contactNumberField: () => cy.get('#validationCustom05[name="contactnumber"]'),
+    pickupDateField: () => cy.get('#validationCustom05[name="pickupdate"]'),
+    paymentMethodField: () => cy.get('#validationCustom04'),
+    submitButton: () => cy.get('form[action="/form-confirmation"] >> button[type="submit"]'),
+    // Validation feedback elements
+    contactNameInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.invalid-feedback'),
+    contactNameValidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.valid-feedback'),
+    contactNumberInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom05[name="contactnumber"]) > div.invalid-feedback'),
+    dateInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom05[name="pickupdate"]) > div.invalid-feedback'),
+    paymentMethodInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom04) > div.invalid-feedback')
+  };
+
   clearContactName() {
-    cy.get(`#validationCustom01`).clear();
+    this.validationElements.contactNameField().clear();
   }
 
   fillContactNumber(value: string) {
-    const field = cy.get(`#validationCustom05[name="contactnumber"]`);
+    const field = this.validationElements.contactNumberField();
     field.clear();
     field.type(value);
     
@@ -15,7 +29,7 @@ class FormValidationPage extends BasePage {
   }
 
   fillDate(value: string) {
-    const field = cy.get(`#validationCustom05[name="pickupdate"]`);
+    const field = this.validationElements.pickupDateField();
     field.clear();
     field.type(value);
     
@@ -23,7 +37,7 @@ class FormValidationPage extends BasePage {
   }
 
   fillContactName(value: string) {
-    const field = cy.get(`#validationCustom01`);
+    const field = this.validationElements.contactNameField();
     field.clear();
     field.type(value);
     
@@ -31,13 +45,13 @@ class FormValidationPage extends BasePage {
   }
 
   fillPaymentMethod(value: string) {
-    cy.get(`#validationCustom04`).select(value);
+    this.validationElements.paymentMethodField().select(value);
     
     return this;
   }
 
   submit() {
-    cy.get(`form[action="/form-confirmation"] >> button[type="submit"]`).click();
+    this.validationElements.submitButton().click();
   }
 
   visit() {
@@ -46,11 +60,26 @@ class FormValidationPage extends BasePage {
 
   verifyPageLoaded() {
     cy.url().should('eq', `${Cypress.config().baseUrl}/form-validation`);
-    cy.shouldExistAndBeVisible(`#validationCustom01`);
-    cy.shouldExistAndBeVisible(`#validationCustom05[name="contactnumber"]`);
-    cy.shouldExistAndBeVisible(`#validationCustom05[name="pickupdate"]`);
-    cy.shouldExistAndBeVisible(`#validationCustom04`);
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] >> button[type="submit"]`);
+    
+    this.validationElements.contactNameField()
+      .should('exist')
+      .and('be.visible');
+    
+    this.validationElements.contactNumberField()
+      .should('exist')
+      .and('be.visible');
+    
+    this.validationElements.pickupDateField()
+      .should('exist')
+      .and('be.visible');
+    
+    this.validationElements.paymentMethodField()
+      .should('exist')
+      .and('be.visible');
+    
+    this.validationElements.submitButton()
+      .should('exist')
+      .and('be.visible');
   }
 
   verifyAllValidationErrors() {
@@ -62,30 +91,39 @@ class FormValidationPage extends BasePage {
   }
 
   verifyContactNameValidationError() {
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.invalid-feedback`)
+    this.validationElements.contactNameInvalidFeedback()
+      .should('exist')
+      .and('be.visible')
       .and('contain', 'Please enter your Contact name.');
   }
 
   verifyContactNameValidationMessage() {
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.valid-feedback`)
+    this.validationElements.contactNameValidFeedback()
+      .should('exist')
+      .and('be.visible')
       .and('contain', 'Looks good!');
   }
 
   verifyContactNumberValidationError() {
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] > div:has(> #validationCustom05[name="contactnumber"]) > div.invalid-feedback`)
+    this.validationElements.contactNumberInvalidFeedback()
+      .should('exist')
+      .and('be.visible')
       .and('contain', 'Please provide your Contact number.');
   }
 
   verifyDateValidationError() {
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] > div:has(> #validationCustom05[name="pickupdate"]) > div.invalid-feedback`)
+    this.validationElements.dateInvalidFeedback()
+      .should('exist')
+      .and('be.visible')
       .and('contain', 'Please provide valid Date.');
   }
 
   verifyPaymentMethodValidationError() {
-    cy.shouldExistAndBeVisible(`form[action="/form-confirmation"] > div:has(> #validationCustom04) > div.invalid-feedback`)
+    this.validationElements.paymentMethodInvalidFeedback()
+      .should('exist')
+      .and('be.visible')
       .and('contain', 'Please select the Payment Method.');
   }
-  
-};
+}
 
 export const formValidationPage = new FormValidationPage();

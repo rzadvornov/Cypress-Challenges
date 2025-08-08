@@ -1,29 +1,33 @@
 export abstract class BasePage {
+  
+  protected elements = {
+    username: () => cy.get('#username'),
+    password: () => cy.get('#password'),
+    alert: () => cy.get('#flash'),
+    alertCloseButton: () => cy.get('#flash > button')
+  };
 
-  abstract verifyPageLoaded(): void
+  abstract verifyPageLoaded(): void;
 
   fillUsername(value: string) {
-    const field = cy.get(`#username`);
+    const field = this.elements.username();
     field.clear();
     field.type(value);
-    
     return this;
   }
 
   fillPassword(value: string) {
-    const field = cy.get(`#password`);
+    const field = this.elements.password();
     field.clear();
     field.type(value);
-    
     return this;
   }
 
   getAlert() {
-    return cy.get(`#flash`);
+    return this.elements.alert();
   }
 
   closeAlert() {
-    cy.get(`#flash > button`).click();
+    this.elements.alertCloseButton().click();
   }
-
 }

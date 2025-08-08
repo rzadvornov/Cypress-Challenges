@@ -86,20 +86,9 @@ declare global {
        */
       verifyShadowRoot(selector: string): Chainable<JQuery<HTMLElement>>;
       
-      /**
-       * Custom command to check if element exists and is visible
-       * @param selector CSS selector for the element
-       * @returns Cypress chainable object
-       * @example cy.shouldExistAndBeVisible('[data-cy="element"]')
-       */
-      shouldExistAndBeVisible(selector: string): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
-
-Cypress.Commands.add('shouldExistAndBeVisible', (selector: string) => {
-  return cy.get(selector).should('exist').and('be.visible');
-});
 
 /**
  * Custom command to pierce through Shadow DOM
