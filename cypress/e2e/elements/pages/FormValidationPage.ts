@@ -21,32 +21,30 @@ class FormValidationPage extends BasePage {
   }
 
   fillContactNumber(value: string) {
-    const field = this.validationElements.contactNumberField();
-    field.clear();
-    field.type(value);
-    
+    this.validationElements.contactNumberField()
+      .clear()
+      .type(value);
     return this;
   }
 
   fillDate(value: string) {
-    const field = this.validationElements.pickupDateField();
-    field.clear();
-    field.type(value);
+    this.validationElements.pickupDateField()
+      .clear()
+      .type(value);
     
     return this;
   }
 
   fillContactName(value: string) {
-    const field = this.validationElements.contactNameField();
-    field.clear();
-    field.type(value);
-    
+    this.validationElements.contactNameField()
+      .clear()
+      .type(value);
     return this;
   }
 
   fillPaymentMethod(value: string) {
-    this.validationElements.paymentMethodField().select(value);
-    
+    this.validationElements.paymentMethodField()
+      .select(value);
     return this;
   }
 

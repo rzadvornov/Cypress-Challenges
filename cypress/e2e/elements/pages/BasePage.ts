@@ -10,16 +10,16 @@ export abstract class BasePage {
   abstract verifyPageLoaded(): void;
 
   fillUsername(value: string) {
-    const field = this.elements.username();
-    field.clear();
-    field.type(value);
+    this.elements.username()
+      .clear()
+      .type(value);
     return this;
   }
 
   fillPassword(value: string) {
-    const field = this.elements.password();
-    field.clear();
-    field.type(value);
+    this.elements.password()
+      .clear()
+      .type(value);
     return this;
   }
 

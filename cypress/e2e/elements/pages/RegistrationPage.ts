@@ -12,10 +12,9 @@ class RegistrationPage extends BasePage {
   }
 
   fillPasswordConfirmation(value: string) {
-    const field = this.registrationElements.confirmPasswordField();
-    field.clear();
-    field.type(value);
-    
+    this.registrationElements.confirmPasswordField()
+      .clear()
+      .type(value);
     return this;
   }
 
