@@ -25,6 +25,31 @@ class HomePage extends BasePage {
     this.homeElements.searchButton().click();
   }
 
+  selectBook(bookTitle: string) {
+    let foundHref: string | null = null;
+    this.homeElements.bookItems().each(($book) => {
+      cy.wrap($book).within(() => {
+        cy.get('[data-testid^="title-"]').should('exist').then(($titleElement) => {
+          const titleElementText = $titleElement.text();
+          if (titleElementText.includes(bookTitle)) {
+            const dataTestId = $titleElement.attr('data-testid');
+            cy.get(`[data-testid="${dataTestId}"]`)
+            .parent()
+            .invoke('attr', 'href')
+            .then((href: string | undefined) => {
+              foundHref = href || '/bookstore';
+          });
+        }
+      });
+    });
+    }).then(() => {
+    // Navigate outside the within block if href was found
+      if (foundHref) {
+        cy.visit(foundHref);
+      }
+    });
+  };
+
   selectCategory(categoryId: string) {
     cy.get(`[data-testid="category-${categoryId}"]`)
       .invoke('attr', 'href')
@@ -125,4 +150,4 @@ class HomePage extends BasePage {
   }
 }
 
-export const homepage = new HomePage();
+export const homePage = new HomePage();

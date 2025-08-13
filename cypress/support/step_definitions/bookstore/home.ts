@@ -1,46 +1,50 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { homepage } from "../../../e2e/elements/pages/bookstore/HomePage";
+import { homePage } from "../../../e2e/elements/pages/bookstore/HomePage";
 
 Given("the user is on the bookstore Homepage", () => {
-  homepage.visit();
+  homePage.visit();
 });
 
 Given("the bookstore Homepage has loaded completely", () => {
-  homepage.verifyPageLoaded();
+  homePage.verifyPageLoaded();
+});
+
+Given("the user clicks on a book titled {string}", (title: string) => {
+  homePage.selectBook(title);
 });
 
 When("the user enters {string} in the search field", (searchTerm: string) => {
-  homepage.enterSearchTerm(searchTerm);
+  homePage.enterSearchTerm(searchTerm);
 });
 
 When("the user clicks the 'Search' button", () => {
-  homepage.search();
+  homePage.search();
 });
 
 When("the user selects category {string} from the category filter", (categoryId: string) => {
-  homepage.selectCategory(categoryId);
+  homePage.selectCategory(categoryId);
 });
 
 Then("the user should see the bookstore logo", () => {
-  homepage.verifyBookstoreLogo();
+  homePage.verifyBookstoreLogo();
 });
 
 Then("the user should see a list of available books", () => {
-  homepage.verifyAvailableBooks();
+  homePage.verifyAvailableBooks();
 });
     
 Then("each book should display title, author, and price", () => {
-  homepage.verifyEachBookHasAttributes();
+  homePage.verifyEachBookHasAttributes();
 });
 
 Then("the user should see navigation elements", () => {
-  homepage.verifyNavigationElements();
+  homePage.verifyNavigationElements();
 });
 
 Then("the user should see search results for {string}", () => {
-  homepage.verifySearchExecuted();
+  homePage.verifySearchExecuted();
 });
 
 Then("each result should contain {string} in the title", (searchTerm: string) => {
-  homepage.verifySearchResult(searchTerm);
+  homePage.verifySearchResult(searchTerm);
 });
