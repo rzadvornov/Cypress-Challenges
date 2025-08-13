@@ -13,6 +13,10 @@ Given("the user clicks on a book titled {string}", (title: string) => {
   homePage.selectBook(title);
 });
 
+Given("the user views the site on a device with resolution {string}", (resolution: string) => {
+  homePage.setResolution(resolution);
+});
+
 When("the user enters {string} in the search field", (searchTerm: string) => {
   homePage.enterSearchTerm(searchTerm);
 });

@@ -29,3 +29,13 @@ Feature: Bookstore Homepage
       | 674106645b85ae33d4d10e62 |
       | 6741066a5b85ae33d4d10e65 |
       | 674106705b85ae33d4d10e68 |
+
+  Scenario Outline: Responsive layout on different screen sizes
+    Given the user views the site on a device with resolution '<resolution>'
+    Then the bookstore Homepage has loaded completely
+
+    Examples:
+      | device  | resolution |
+      | mobile  | 375x667    |
+      | tablet  | 768x1024   |
+      | desktop | 1920x1080  |

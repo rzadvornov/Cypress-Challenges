@@ -58,6 +58,11 @@ class HomePage extends BasePage {
       });
   }
 
+  setResolution(resolution: string) {
+    const [width, height] = resolution.split('x').map(Number);
+    cy.viewport(width, height);
+  }
+
   visit() {
     cy.visit(`/bookstore`);
   }
