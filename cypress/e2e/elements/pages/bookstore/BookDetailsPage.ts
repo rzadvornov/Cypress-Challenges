@@ -7,7 +7,7 @@ class BookDetailsPage extends BasePage {
   protected bookDetailsElements = {
     bookTitle: () => cy.get(`h3`),
     addToCart: () => cy.get(`a[href*="bookstore/add-to-cart/"]`),
-    cartItems: () => cy.get(`.badge`),
+    cartItems: () => cy.get(`.badge`)
   };
 
   clickAddToCartButton() {
