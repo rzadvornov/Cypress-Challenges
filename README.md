@@ -40,6 +40,10 @@ npm i eslint-config-airbnb-typescript
 
 # Install cypress plugins
 npm install --save-dev @4tw/cypress-drag-drop
+
+# Install additional libraries
+npm install --save-dev @faker-js/faker
+npm install --save-dev @percy/cli @percy/cypress
 ```
 
 ### 2. Initialize Cypress
@@ -236,16 +240,17 @@ Then("the password field should be cleared", () => {
 
 ```bash
 # Open Cypress Test Runner
+# Run tests headlessly with Percy
 npm run cy:open
 
-# Run tests headlessly
-npm run cy:run
+# Run tests headlessly with Percy
+percy exec -- cypress run
 
-# Run specific test file
-npm run cy:run -- --spec "cypress/e2e/features/Login.feature"
+# Run specific test file with Percy
+percy exec -- cypress run --spec "cypress/e2e/features/Login.feature"
 
-# Run tests in specific browser
-npm run cy:run -- --browser chrome
+# Run tests in specific browser with Percy
+percy exec -- cypress run --browser chrome
 ```
 
 ### Package.json Scripts

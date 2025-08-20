@@ -47,34 +47,33 @@ class DialogsPage extends BasePage {
 
   verifyDialogResponse(response: string) {
     response ? this.dialogElements.dialogResponse()
-                  .should('have.css', 'color', 'rgb(0, 128, 0)')
+                  .should('be.visible')
                   .contains(response)
               : this.dialogElements.dialogResponse()
-                  .should('have.css', 'color', 'rgb(0, 128, 0)')
+                  .should('be.visible')
                   .and('be.empty');
   }
 
   visit() {
-    cy.visit('/js-dialogs');
+    cy.visit(`${Cypress.env('dialogs_url')}`);
   }
 
   verifyPageLoaded(): void {
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('JS Dialogs Page', { scope: selector });
+      });
     this.dialogElements.jsAlertButton()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)')
+      .should('be.visible')
       .contains('Js Alert');
     
     this.dialogElements.jsConfirmButton()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)')
+      .should('be.visible')
       .contains('Js Confirm');
     
     this.dialogElements.jsPromptButton()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)')
+      .should('be.visible')
       .contains('Js Prompt');
     
     this.verifyDialogResponse('Waiting');

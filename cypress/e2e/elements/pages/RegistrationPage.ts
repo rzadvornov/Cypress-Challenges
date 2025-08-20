@@ -23,27 +23,16 @@ class RegistrationPage extends BasePage {
   }
 
   visit() {
-    cy.visit('/register');
+    cy.visit(`${Cypress.env('registration_url')}`);
   }
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/register`);
-    
-    this.elements.username()
-      .should('exist')
-      .and('be.visible');
-    
-    this.elements.password()
-      .should('exist')
-      .and('be.visible');
-    
-    this.registrationElements.confirmPasswordField()
-      .should('exist')
-      .and('be.visible');
-    
-    this.registrationElements.submitButton()
-      .should('exist')
-      .and('be.visible');
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('registration_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Registration Page', { scope: selector });
+      });
   }
 }
 

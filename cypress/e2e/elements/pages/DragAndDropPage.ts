@@ -12,7 +12,7 @@ class DragAndDropPage extends BasePage {
   };
 
   visit() {
-    cy.visit('/drag-and-drop');
+    cy.visit(`${Cypress.env('drag_and_drop_url')}`);
   }
 
   verifyElement(element: string) {
@@ -24,13 +24,11 @@ class DragAndDropPage extends BasePage {
   }
 
   verifyPageLoaded(): void {
-    this.dragDropElements.columnA()
-      .should('exist')
-      .and('be.visible');
-    
-    this.dragDropElements.columnB()
-      .should('exist')
-      .and('be.visible');
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Drag and Drop Page', { scope: selector });
+      });
   }
 
   performDragAndDrop(elementA: string, elementB: string) {

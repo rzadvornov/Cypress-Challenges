@@ -1,6 +1,7 @@
 export abstract class BasePage {
   
   protected elements = {
+    baseContainer: () => cy.get('#core'),
     username: () => cy.get('#username'),
     password: () => cy.get('#password'),
     alert: () => cy.get('#flash'),

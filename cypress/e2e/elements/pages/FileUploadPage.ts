@@ -19,50 +19,42 @@ class FileUploadPage extends BasePage {
   }
 
   visit() {
-    cy.visit('/upload');
+    cy.visit(`${Cypress.env('file_upload_url')}`);
   }
 
   verifyPageLoaded() {
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('File Upload Page', { scope: selector });
+      });
     this.fileUploadElements.warningMessage()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(255, 193, 7)')
+      .should('be.visible')
       .contains('Only a file less than 500KB will be accepted.');
-    
-    this.fileUploadElements.fileSubmit()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)');
-    
-    this.verifyFileInput();
-  }
-
-  verifyFileInput() {
-    this.fileUploadElements.fileInput()
-      .should('exist')
-      .and('be.visible');
   }
 
   verifyFileUploaded(fileName: string) {
     this.verifyFileUploadHeader();
     this.fileUploadElements.uploadedFiles()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(207, 244, 252)')
+      .should('be.visible')
       .contains(fileName);
   }
 
   verifyFileUploadHeader() {
     this.fileUploadElements.pageHeader()
-      .should('exist')
-      .and('be.visible')
+      .should('be.visible')
       .contains('File Uploaded!');
   }
 
   verifyFileValidationError() {
     const alert = this.getAlert();
-    alert.should('have.css', 'background-color', 'rgb(248, 215, 218)')
-         .contains('File too large, please select a file less than 500KB');
+    alert.should('be.visible')
+      .contains('File too large, please select a file less than 500KB')
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('File Upload Page - File Validation Error', { scope: selector });
+      });;
+    
   }
 }
 

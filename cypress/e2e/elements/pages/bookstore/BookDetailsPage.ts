@@ -16,7 +16,7 @@ class BookDetailsPage extends BasePage {
   }
 
   verifyPageLoaded(): void {
-    cy.url().should('include', `${Cypress.config().baseUrl}/bookstore/`);
+    cy.url().should('include', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}/`);
   }
 
   verifyBookTitle(title: string) {
@@ -47,9 +47,14 @@ class BookDetailsPage extends BasePage {
 
   verifyAddToCartButton() {
     this.bookDetailsElements.addToCart()
-      .should('be.visible')
-      .and('have.css', 'background-color', 'rgb(220, 53, 69)')
-      .contains('Add to card');
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Book Details Page Add To Cart button', { scope: selector });
+      });
+    this.bookDetailsElements.addToCart()
+      .should('be.visible') 
+      .contains('Add To Cart');
+    
   }
 
   verifyBookCounter() {

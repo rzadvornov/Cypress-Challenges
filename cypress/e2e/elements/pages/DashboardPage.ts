@@ -15,13 +15,18 @@ class DashboardPage extends BasePage {
   };
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/secure`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('dashboard_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Secure Dashboard Page', { scope: selector });
+      });
   }
 
   verifyGreetingMessage(userName: string) {
     this.dashboardElements.greetingMessage()
+      .should('be.visible')
       .contains(`Hi, ${userName}!`)
-      .should('have.attr', 'style', 'color: blue;');
   }
 
   verifyUserSession() {

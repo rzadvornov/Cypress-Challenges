@@ -37,7 +37,7 @@ class HomePage extends BasePage {
             .parent()
             .invoke('attr', 'href')
             .then((href: string | undefined) => {
-              foundHref = href || '/bookstore';
+              foundHref = href || `${Cypress.env('bookstore_url')}`;
           });
         }
       });
@@ -54,7 +54,7 @@ class HomePage extends BasePage {
     cy.get(`[data-testid="category-${categoryId}"]`)
       .invoke('attr', 'href')
       .then((href) => {
-        cy.visit(href || '/bookstore');
+        cy.visit(href || `${Cypress.env('bookstore_url')}`);
       });
   }
 
@@ -63,35 +63,35 @@ class HomePage extends BasePage {
     cy.viewport(width, height);
   }
 
+  signIn() {
+    this.homeElements.signInButton().click();
+  }
+
   visit() {
-    cy.visit(`/bookstore`);
+    cy.visit(`${Cypress.env('bookstore_url')}`);
   }
 
   verifyPageLoaded(): void {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/bookstore`);
-    this.homeElements.searchField()
-      .should('be.visible');
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Book Store Home Page', { scope: selector });
+      });
     this.homeElements.searchButton()
-      .contains('Search')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)');
+      .should('be.visible')
+      .contains('Search');
     this.verifyNavigationElements();
     this.verifyBookstoreLogo();
     this.homeElements.logo()
-      .contains('All Books').and('be.visible');
-    this.homeElements.bookContainer()
-      .should('be.visible');
-    this.homeElements.categoryFilter()
-      .should('be.visible');
-    this.homeElements.cartCounter()
-      .should('be.visible');
+      .should('be.visible')
+      .contains('All Books');
   }
 
   verifyNavigationElements() {
     this.homeElements.signInButton()
-      .contains("Sign In")
-      .and('have.attr', 'style', 'color: white;');
-    this.homeElements.cartIcon().should('be.visible');
-    this.homeElements.paginationContainer().should('be.visible');
+      .should('be.visible')
+      .contains("Sign In");
   }
 
   verifySearchExecuted() {
@@ -121,7 +121,9 @@ class HomePage extends BasePage {
                 // Now verify all elements for this specific book
               cy.get(`[data-testid="title-${bookId}"]`)
                 .should('exist')
-                .and('be.visible');
+                .and('be.visible')
+                .invoke('text')
+                .should('have.length.gt', 0);
               cy.get(`[data-testid="price-${bookId}"]`)
                 .should('exist')
                 .invoke('text')
@@ -133,9 +135,6 @@ class HomePage extends BasePage {
               cy.get(`[data-testid="cart-${bookId}"]`)
                 .should('exist')
                 .contains('Add To Cart');
-              cy.get(`[data-testid="image-${bookId}"]`)
-                .should('exist')
-                .and('be.visible');
             } else {
                 throw new Error('data-testid attribute not found on title element');
             }
@@ -151,7 +150,8 @@ class HomePage extends BasePage {
   
   verifyBookstoreLogo() {
     this.homeElements.logo()
-      .contains('All Books').and('be.visible');
+      .should('be.visible')
+      .contains('All Books');
   }
 }
 

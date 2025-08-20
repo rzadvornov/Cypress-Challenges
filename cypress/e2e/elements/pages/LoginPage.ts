@@ -54,19 +54,12 @@ class LoginPage extends BasePage {
   }
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/login`);
-    
-    this.elements.username()
-      .should('exist')
-      .and('be.visible');
-    
-    this.elements.password()
-      .should('exist')
-      .and('be.visible');
-    
-    this.loginElements.submitButton()
-      .should('exist')
-      .and('be.visible');
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('login_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Login Page', { scope: selector });
+      });
   }
 
   verifyEmptyUsername() {

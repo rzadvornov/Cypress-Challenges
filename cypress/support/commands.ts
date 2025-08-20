@@ -86,9 +86,25 @@ declare global {
        */
       verifyShadowRoot(selector: string): Chainable<JQuery<HTMLElement>>;
       
+      /**
+      * Custom command to get the optimal selector for an element using Cypress SelectorPlayground
+      * @example cy.get('#my-element').getSelector()
+      */
+      getSelector(): Chainable<string>;
     }
   }
 }
+
+/**
+ * Custom Cypress command to get the optimal selector for an element
+ * @param {JQuery} $element - The jQuery element object
+ * @returns {Chainable<string>} The optimal selector for the element wrapped in a Cypress chainable
+ */
+Cypress.Commands.add('getSelector', { prevSubject: ['element'] }, ($element) => {
+  const selector = Cypress.SelectorPlayground.getSelector($element);
+  cy.log(`The selector for this element is: ${selector}`);
+  return cy.wrap(selector);
+});
 
 /**
  * Custom command to pierce through Shadow DOM
@@ -160,4 +176,5 @@ Cypress.Commands.add('getShadowRootMode', (selector) => {
     }
   });  
 
+  
 });

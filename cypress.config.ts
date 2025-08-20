@@ -4,6 +4,19 @@ import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-prepro
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild";
 
 export default defineConfig({
+  env: {
+    login_url: '/login',
+    shadow_dom_url: '/shadowdom',
+    registration_url: '/register',
+    form_validation_url: '/form-validation',
+    form_confirmation_url: '/form-confirmation',
+    file_upload_url: '/upload',
+    drag_and_drop_url: '/drag-and-drop',
+    dialogs_url: '/js-dialogs',
+    dashboard_url: '/secure',
+    cart_url: '/cart',
+    bookstore_url: '/bookstore'
+  },
   e2e: {
     baseUrl: 'https://practice.expandtesting.com',
     specPattern: "**/*.feature",

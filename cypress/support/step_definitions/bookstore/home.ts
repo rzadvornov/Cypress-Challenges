@@ -1,13 +1,15 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import { homePage } from "../../../e2e/elements/pages/bookstore/HomePage";
 
+const verifyHomePageLoaded = () => {
+  homePage.verifyPageLoaded();
+};
+
 Given("the user is on the bookstore Homepage", () => {
   homePage.visit();
 });
 
-Given("the bookstore Homepage has loaded completely", () => {
-  homePage.verifyPageLoaded();
-});
+Given("the bookstore Homepage has loaded completely", verifyHomePageLoaded);
 
 Given("the user clicks on a book titled {string}", (title: string) => {
   homePage.selectBook(title);
@@ -27,6 +29,10 @@ When("the user clicks the 'Search' button", () => {
 
 When("the user selects category {string} from the category filter", (categoryId: string) => {
   homePage.selectCategory(categoryId);
+});
+
+When("the user clicks on 'Sign In' button", () => {
+  homePage.signIn();
 });
 
 Then("the user should see the bookstore logo", () => {
@@ -52,3 +58,5 @@ Then("the user should see search results for {string}", () => {
 Then("each result should contain {string} in the title", (searchTerm: string) => {
   homePage.verifySearchResult(searchTerm);
 });
+
+Then("the user should be redirected to bookstore Homepage", verifyHomePageLoaded);

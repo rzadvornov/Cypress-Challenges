@@ -53,35 +53,20 @@ class FormValidationPage extends BasePage {
   }
 
   visit() {
-    cy.visit('/form-validation');
+    cy.visit(`${Cypress.env('form_validation_url')}`);
   }
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/form-validation`);
-    
-    this.validationElements.contactNameField()
-      .should('exist')
-      .and('be.visible');
-    
-    this.validationElements.contactNumberField()
-      .should('exist')
-      .and('be.visible');
-    
-    this.validationElements.pickupDateField()
-      .should('exist')
-      .and('be.visible');
-    
-    this.validationElements.paymentMethodField()
-      .should('exist')
-      .and('be.visible');
-    
-    this.validationElements.submitButton()
-      .should('exist')
-      .and('be.visible');
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_validation_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Form Validation Page', { scope: selector });
+      });
   }
 
   verifyAllValidationErrors() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/form-validation`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_validation_url')}`);
     this.verifyContactNameValidationError();
     this.verifyContactNumberValidationError();
     this.verifyDateValidationError();
@@ -90,37 +75,32 @@ class FormValidationPage extends BasePage {
 
   verifyContactNameValidationError() {
     this.validationElements.contactNameInvalidFeedback()
-      .should('exist')
-      .and('be.visible')
-      .and('contain', 'Please enter your Contact name.');
+      .should('be.visible')
+      .contains('Please enter your Contact name.');
   }
 
   verifyContactNameValidationMessage() {
     this.validationElements.contactNameValidFeedback()
-      .should('exist')
-      .and('be.visible')
-      .and('contain', 'Looks good!');
+      .should('be.visible')
+      .contains('Looks good!');
   }
 
   verifyContactNumberValidationError() {
     this.validationElements.contactNumberInvalidFeedback()
-      .should('exist')
-      .and('be.visible')
-      .and('contain', 'Please provide your Contact number.');
+      .should('be.visible')
+      .contains('Please provide your Contact number.');
   }
 
   verifyDateValidationError() {
     this.validationElements.dateInvalidFeedback()
-      .should('exist')
-      .and('be.visible')
-      .and('contain', 'Please provide valid Date.');
+      .should('be.visible')
+      .contains('Please provide valid Date.');
   }
 
   verifyPaymentMethodValidationError() {
     this.validationElements.paymentMethodInvalidFeedback()
-      .should('exist')
-      .and('be.visible')
-      .and('contain', 'Please select the Payment Method.');
+      .should('be.visible')
+      .contains('Please select the Payment Method.');
   }
 }
 

@@ -17,33 +17,33 @@ class ShadowDomPage extends BasePage {
   }
 
   visit() {
-    cy.visit('/shadowdom');
+    cy.visit(`${Cypress.env('shadow_dom_url')}`);
   }
   
   verifyPageLoaded(): void {
+     this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Shadow Dom Page', { scope: selector });
+      });
     this.shadowDomElements.primaryButton()
-      .should('exist')
-      .and('be.visible')
-      .and('have.css', 'background-color', 'rgb(13, 110, 253)')
+      .should('be.visible')
       .contains("Here's a basic button example.");
     
     this.shadowDomElements.pageHeader()
-      .should('contain.text', 'Shadow DOM');
+      .should('be.visible')
+      .contains('Shadow DOM');
     
     this.verifyShadowDomButton();
   }
 
   verifyShadowDomButton() {
     this.shadowDomElements.shadowDomButton()
-      .should('have.css', 'background-color', 'rgb(24, 43, 69)')
+      .should('be.visible')
       .contains("This button is inside a Shadow DOM.");
   }
 
   verifyShadowHost() {
-    this.shadowDomElements.shadowHost()
-      .should('exist')
-      .and('be.visible');
-    
     cy.hasShadowRoot(`#shadow-host`);
   }
 

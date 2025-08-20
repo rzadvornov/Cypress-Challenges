@@ -7,12 +7,17 @@ class FormConfirmationPage extends BasePage {
   };
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/form-confirmation`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_confirmation_url')}`);
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Form Confirmation Page', { scope: selector });
+      });
   }
 
   verifyAlertMessage() {
     this.confirmationElements.alertMessage()
-      .should('have.css', 'background-color', 'rgb(207, 244, 252)')
+      .should('be.visible')
       .contains('Thank you for validating your ticket');
   }
 }
