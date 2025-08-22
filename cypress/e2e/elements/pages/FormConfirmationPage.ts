@@ -2,12 +2,20 @@ import { BasePage } from "./BasePage";
 
 class FormConfirmationPage extends BasePage {
   
+  private readonly confirmationSelectors = {
+    alertMessage: '.alert'
+  } as const;
+
   protected confirmationElements = {
-    alertMessage: () => cy.get('.alert')
+    alertMessage: () => cy.get(`${this.confirmationSelectors.alertMessage}`)
   };
 
-  verifyPageLoaded() {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_confirmation_url')}`);
+  }
+
+  verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

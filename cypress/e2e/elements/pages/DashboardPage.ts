@@ -8,14 +8,25 @@ const CONFIG = {
 
 class DashboardPage extends BasePage {
   
+  private readonly dashboardSelectors = {
+    usernameGreeting: '#username',
+    coreContainer: '#core',
+    logoutLink: 'a[href="/logout"]'
+  } as const;
+
   protected dashboardElements = {
-    greetingMessage: () => cy.get('#username'), 
-    coreContainer: () => cy.get('#core'),
-    logoutLink: () => cy.get('#core').find('a[href="/logout"]')
+    greetingMessage: () => cy.get(`${this.dashboardSelectors.usernameGreeting}`),
+    coreContainer: () => cy.get(`${this.dashboardSelectors.coreContainer}`),
+    logoutLink: () => cy.get(`${this.dashboardSelectors.coreContainer}`)
+      .find(`${this.dashboardSelectors.logoutLink}`)
   };
 
-  verifyPageLoaded() {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('dashboard_url')}`);
+  }
+
+  verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

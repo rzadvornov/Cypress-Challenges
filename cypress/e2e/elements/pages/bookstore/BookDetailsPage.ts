@@ -4,10 +4,16 @@ class BookDetailsPage extends BasePage {
 
   protected bookCounter: number = 0;
   
+  private readonly bookSelectors = {
+    bookTitle: 'h3',
+    addToCartLink: 'a[href*="bookstore/add-to-cart/"]',
+    cartBadge: '.badge'
+  } as const;
+
   protected bookDetailsElements = {
-    bookTitle: () => cy.get(`h3`),
-    addToCart: () => cy.get(`a[href*="bookstore/add-to-cart/"]`),
-    cartItems: () => cy.get(`.badge`)
+    bookTitle: () => cy.get(`${this.bookSelectors.bookTitle}`),
+    addToCart: () => cy.get(`${this.bookSelectors.addToCartLink}`),
+    cartItems: () => cy.get(`${this.bookSelectors.cartBadge}`)
   };
 
   clickAddToCartButton() {
@@ -15,8 +21,12 @@ class BookDetailsPage extends BasePage {
     this.bookCounter++;
   }
 
-  verifyPageLoaded(): void {
+  verifyPageUrl() {
     cy.url().should('include', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}/`);
+  }
+
+  verifyPageLoaded(): void {
+    this.verifyPageUrl();
   }
 
   verifyBookTitle(title: string) {

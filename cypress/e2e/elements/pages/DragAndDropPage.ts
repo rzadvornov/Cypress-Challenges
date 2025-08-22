@@ -2,13 +2,25 @@ import { BasePage } from "./BasePage";
 
 class DragAndDropPage extends BasePage {
   
+  private readonly dragDropSelectors = {
+    columnA: '#column-a',
+    columnB: '#column-b',
+    columnPrefix: '#column-',
+    dndColumnsContainer: '#dnd-columns',
+    columnClass: '.column',
+    headerTag: 'header'
+  } as const;
+
   protected dragDropElements = {
-    columnA: () => cy.get('#column-a'),
-    columnB: () => cy.get('#column-b'),
-    column: (element: string) => cy.get(`#column-${element.toLowerCase()}`),
-    columnHeader: (element: string) => cy.get(`#column-${element.toLowerCase()}`).find('header'),
-    dndColumns: () => cy.get('#dnd-columns .column'),
-    columnByIndex: (index: number) => cy.get('#dnd-columns .column').eq(index)
+    columnA: () => cy.get(`${this.dragDropSelectors.columnA}`),
+    columnB: () => cy.get(`${this.dragDropSelectors.columnB}`),
+    column: (element: string) => cy.get(`${this.dragDropSelectors.columnPrefix}${element.toLowerCase()}`),
+    columnHeader: (element: string) => cy.get(`${this.dragDropSelectors.columnPrefix}${element.toLowerCase()}`)
+      .find(`${this.dragDropSelectors.headerTag}`),
+    dndColumns: () => cy.get(`${this.dragDropSelectors.dndColumnsContainer}`)
+      .find(`${this.dragDropSelectors.columnClass}`),
+    columnByIndex: (index: number) => cy.get(`${this.dragDropSelectors.dndColumnsContainer}`)
+      .find(`${this.dragDropSelectors.columnClass}`).eq(index)
   };
 
   visit() {
@@ -23,7 +35,12 @@ class DragAndDropPage extends BasePage {
       .should('contain.text', element);
   }
 
+  verifyPageUrl() {
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('drag_and_drop_url')}`);
+  }
+
   verifyPageLoaded(): void {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

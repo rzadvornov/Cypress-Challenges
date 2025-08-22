@@ -2,17 +2,30 @@ import { BasePage } from "../BasePage";
 
 class HomePage extends BasePage {
   
+  private readonly homeSelectors = {
+    logoLink: 'a[href*="bookstore"]',
+    booksContainer: '#books',
+    bookCards: '#books .card-product-user',
+    searchInput: '#search-input',
+    searchButton: '[data-testid="search-btn"], .search-button, button[type="submit"]',
+    categoryFilter: '.filter_sort',
+    cartLink: 'a[href*="cart"]',
+    cartCounter: '[data-testid="cart-count"], .cart-count, .badge',
+    signInButton: '[data-testid="goto-signin"]',
+    paginationContainer: '#pagination'
+  } as const;
+
   protected homeElements = {
-    logo: () => cy.get(`a[href*="bookstore"]`),
-    bookContainer: () => cy.get(`#books`),
-    bookItems: () => cy.get(`#books .card-product-user`),
-    searchField: () => cy.get(`#search-input`),
-    searchButton: () => cy.get(`[data-testid="search-btn"], .search-button, button[type="submit"]`),
-    categoryFilter: () => cy.get(`.filter_sort`),
-    cartIcon: () => cy.get(`a[href*="cart"]`),
-    cartCounter: () => cy.get(`[data-testid="cart-count"], .cart-count, .badge`),
-    signInButton: () => cy.get(`[data-testid="goto-signin"]`),
-    paginationContainer: () => cy.get(`#pagination`)
+    logo: () => cy.get(`${this.homeSelectors.logoLink}`),
+    bookContainer: () => cy.get(`${this.homeSelectors.booksContainer}`),
+    bookItems: () => cy.get(`${this.homeSelectors.bookCards}`),
+    searchField: () => cy.get(`${this.homeSelectors.searchInput}`),
+    searchButton: () => cy.get(`${this.homeSelectors.searchButton}`),
+    categoryFilter: () => cy.get(`${this.homeSelectors.categoryFilter}`),
+    cartIcon: () => cy.get(`${this.homeSelectors.cartLink}`),
+    cartCounter: () => cy.get(`${this.homeSelectors.cartCounter}`),
+    signInButton: () => cy.get(`${this.homeSelectors.signInButton}`),
+    paginationContainer: () => cy.get(`${this.homeSelectors.paginationContainer}`)
   };
 
   enterSearchTerm(searchTerm: string) {
@@ -71,8 +84,12 @@ class HomePage extends BasePage {
     cy.visit(`${Cypress.env('bookstore_url')}`);
   }
 
-  verifyPageLoaded(): void {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}`);
+  }
+
+  verifyPageLoaded(): void {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

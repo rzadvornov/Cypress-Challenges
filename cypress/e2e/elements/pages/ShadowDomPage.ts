@@ -2,13 +2,22 @@ import { BasePage } from "./BasePage";
 
 class ShadowDomPage extends BasePage {
   
+  private readonly shadowDomSelectors = {
+    body: 'body',
+    primaryButton: '#my-btn.btn-primary',
+    pageHeader: 'h1',
+    shadowHost: '#shadow-host',
+    shadowDomButton: '#my-btn'
+  } as const;
+
   protected shadowDomElements = {
-    body: () => cy.get('body'),
+    body: () => cy.get(`${this.shadowDomSelectors.body}`),
     document: () => cy.document(),
-    primaryButton: () => cy.get('#my-btn.btn-primary'),
-    pageHeader: () => cy.get('h1'),
-    shadowHost: () => cy.get('#shadow-host'),
-    shadowDomButton: () => cy.get('#shadow-host').find('#my-btn')
+    primaryButton: () => cy.get(`${this.shadowDomSelectors.primaryButton}`),
+    pageHeader: () => cy.get(`${this.shadowDomSelectors.pageHeader}`),
+    shadowHost: () => cy.get(`${this.shadowDomSelectors.shadowHost}`),
+    shadowDomButton: () => cy.get(`${this.shadowDomSelectors.shadowHost}`)
+     .find(`${this.shadowDomSelectors.shadowDomButton}`)
   };
   
   inspectStructure() {
@@ -20,8 +29,13 @@ class ShadowDomPage extends BasePage {
     cy.visit(`${Cypress.env('shadow_dom_url')}`);
   }
   
+  verifyPageUrl() {
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('shadow_dom_url')}`);
+  }
+
   verifyPageLoaded(): void {
-     this.elements.baseContainer()
+    this.verifyPageUrl();
+    this.elements.baseContainer()
       .getSelector()
       .then((selector) => {
         cy.percySnapshot('Shadow Dom Page', { scope: selector });

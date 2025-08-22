@@ -2,11 +2,18 @@ import { BasePage } from "./BasePage";
 
 class DialogsPage extends BasePage {
   
+  private readonly dialogSelectors = {
+    jsAlertButton: '#js-alert',
+    jsConfirmButton: '#js-confirm',
+    jsPromptButton: '#js-prompt',
+    dialogResponse: '#dialog-response'
+  } as const;
+
   protected dialogElements = {
-    jsAlertButton: () => cy.get('#js-alert'),
-    jsConfirmButton: () => cy.get('#js-confirm'),
-    jsPromptButton: () => cy.get('#js-prompt'),
-    dialogResponse: () => cy.get('#dialog-response')
+    jsAlertButton: () => cy.get(`${this.dialogSelectors.jsAlertButton}`),
+    jsConfirmButton: () => cy.get(`${this.dialogSelectors.jsConfirmButton}`),
+    jsPromptButton: () => cy.get(`${this.dialogSelectors.jsPromptButton}`),
+    dialogResponse: () => cy.get(`${this.dialogSelectors.dialogResponse}`)
   };
 
   clickJsAlertButton() {
@@ -58,7 +65,12 @@ class DialogsPage extends BasePage {
     cy.visit(`${Cypress.env('dialogs_url')}`);
   }
 
+  verifyPageUrl() {
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('dialogs_url')}`);
+  }
+
   verifyPageLoaded(): void {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

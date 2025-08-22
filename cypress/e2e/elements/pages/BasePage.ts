@@ -1,11 +1,19 @@
 export abstract class BasePage {
   
+  private readonly baseSelectors = {
+    coreContainer: '#core',
+    usernameInput: '#username',
+    passwordInput: '#password',
+    flashAlert: '#flash',
+    flashCloseButton: '#flash > button'
+  } as const;
+
   protected elements = {
-    baseContainer: () => cy.get('#core'),
-    username: () => cy.get('#username'),
-    password: () => cy.get('#password'),
-    alert: () => cy.get('#flash'),
-    alertCloseButton: () => cy.get('#flash > button')
+    baseContainer: () => cy.get(`${this.baseSelectors.coreContainer}`),
+    username: () => cy.get(`${this.baseSelectors.usernameInput}`),
+    password: () => cy.get(`${this.baseSelectors.passwordInput}`),
+    alert: () => cy.get(`${this.baseSelectors.flashAlert}`),
+    alertCloseButton: () => cy.get(`${this.baseSelectors.flashCloseButton}`)
   };
 
   abstract verifyPageLoaded(): void;

@@ -2,9 +2,16 @@ import { BasePage } from "./BasePage";
 
 class RegistrationPage extends BasePage {
   
+  private readonly registrationSelectors = {
+    confirmPasswordField: '#confirmPassword',
+    registerForm: '#register',
+    submitButton: 'button'
+  } as const;
+
   protected registrationElements = {
-    confirmPasswordField: () => cy.get('#confirmPassword'),
-    submitButton: () => cy.get('#register > button')
+    confirmPasswordField: () => cy.get(`${this.registrationSelectors.confirmPasswordField}`),
+    submitButton: () => cy.get(`${this.registrationSelectors.registerForm}`)
+      .find(`${this.registrationSelectors.submitButton}`)
   };
 
   clearUsername() {
@@ -26,8 +33,12 @@ class RegistrationPage extends BasePage {
     cy.visit(`${Cypress.env('registration_url')}`);
   }
 
-  verifyPageLoaded() {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('registration_url')}`);
+  }
+
+  verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

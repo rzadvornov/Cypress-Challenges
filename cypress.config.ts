@@ -15,6 +15,10 @@ export default defineConfig({
     dialogs_url: '/js-dialogs',
     dashboard_url: '/secure',
     cart_url: '/cart',
+    checkout_url: '/checkout',
+    profile_url: '/user/profile',
+    signIn_url: '/user/signin',
+    signUp_url: '/user/signup',
     bookstore_url: '/bookstore'
   },
   e2e: {

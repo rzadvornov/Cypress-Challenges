@@ -1,11 +1,17 @@
-import { should } from "chai";
 import { BasePage } from "../BasePage";
 
 class NotFoundPage extends BasePage {
   
+  private readonly notFoundSelectors = {
+    notFoundHeader: 'h1',
+    coreContainer: '#core',
+    backToHomeLink: 'a[href*="/"]'
+  } as const;
+
   protected notFoundElements = {
-    notFound: () => cy.get(`h1`),
-    backToHomePageButton: () => cy.get(`#core`).find(`a[href*="/"]`)
+    notFound: () => cy.get(`${this.notFoundSelectors.notFoundHeader}`),
+    backToHomePageButton: () => cy.get(`${this.notFoundSelectors.coreContainer}`)
+    .find(`${this.notFoundSelectors.backToHomeLink}`)
   };
 
   clickBackToHomePageButton() {

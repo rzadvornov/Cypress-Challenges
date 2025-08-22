@@ -4,12 +4,23 @@ import { Singleton } from "../../../support/utilities/Decorators";
 @Singleton
 class LoginPage extends BasePage {
   
+  private readonly loginSelectors = {
+    coreContainer: '#core',
+    listItems: 'ul > li',
+    loginForm: '#login',
+    submitButton: 'button'
+  } as const;
+
   protected loginElements = {
-    coreContainer: () => cy.get('#core'),
-    credentialsListItems: () => cy.get('#core').find('ul > li'),
-    usernameListItem: () => cy.get('#core').find('ul > li').contains('Username:'),
-    passwordListItem: () => cy.get('#core').find('ul > li').contains('Password:'),
-    submitButton: () => cy.get('#login > button')
+    coreContainer: () => cy.get(`${this.loginSelectors.coreContainer}`),
+    credentialsListItems: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`),
+    usernameListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`).contains('Username:'),
+    passwordListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`).contains('Password:'),
+    submitButton: () => cy.get(`${this.loginSelectors.loginForm}`)
+      .find(`${this.loginSelectors.submitButton}`)
   };
 
   #username: string;
@@ -53,8 +64,12 @@ class LoginPage extends BasePage {
     this.loginElements.submitButton().click();
   }
 
-  verifyPageLoaded() {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('login_url')}`);
+  }
+
+  verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

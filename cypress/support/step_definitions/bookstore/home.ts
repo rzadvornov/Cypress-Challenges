@@ -31,7 +31,7 @@ When("the user selects category {string} from the category filter", (categoryId:
   homePage.selectCategory(categoryId);
 });
 
-When("the user clicks on 'Sign In' button", () => {
+When("the user clicks on 'Sign In' button at 'Bookstore Home' page", () => {
   homePage.signIn();
 });
 

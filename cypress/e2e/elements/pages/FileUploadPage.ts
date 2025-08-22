@@ -2,12 +2,20 @@ import { BasePage } from "./BasePage";
 
 class FileUploadPage extends BasePage {
   
+  private readonly fileUploadSelectors = {
+    fileInput: '#fileInput',
+    fileSubmit: '#fileSubmit',
+    warningMessage: '#core >> div:has(> h1)> p',
+    uploadedFiles: '#uploaded-files',
+    pageHeader: 'h1'
+  } as const;
+
   protected fileUploadElements = {
-    fileInput: () => cy.get('#fileInput'),
-    fileSubmit: () => cy.get('#fileSubmit'),
-    warningMessage: () => cy.get('#core >> div:has(> h1)> p'),
-    uploadedFiles: () => cy.get('#uploaded-files'),
-    pageHeader: () => cy.get('h1')
+    fileInput: () => cy.get(`${this.fileUploadSelectors.fileInput}`),
+    fileSubmit: () => cy.get(`${this.fileUploadSelectors.fileSubmit}`),
+    warningMessage: () => cy.get(`${this.fileUploadSelectors.warningMessage}`),
+    uploadedFiles: () => cy.get(`${this.fileUploadSelectors.uploadedFiles}`),
+    pageHeader: () => cy.get(`${this.fileUploadSelectors.pageHeader}`)
   };
 
   submit() {
@@ -22,7 +30,12 @@ class FileUploadPage extends BasePage {
     cy.visit(`${Cypress.env('file_upload_url')}`);
   }
 
+  verifyPageUrl() {
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('file_upload_url')}`);
+  }
+
   verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {

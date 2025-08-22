@@ -2,18 +2,39 @@ import { BasePage } from "./BasePage";
 
 class FormValidationPage extends BasePage {
   
+  private readonly validationSelectors = {
+    contactNameField: '#validationCustom01',
+    contactNumberField: '#validationCustom05[name="contactnumber"]',
+    pickupDateField: '#validationCustom05[name="pickupdate"]',
+    paymentMethodField: '#validationCustom04',
+    formAction: 'form[action="/form-confirmation"]',
+    submitButton: 'button[type="submit"]',
+    invalidFeedback: 'div.invalid-feedback',
+    validFeedback: 'div.valid-feedback',
+    contactNameContainer: 'form[action="/form-confirmation"] > div:has(> #validationCustom01)',
+    contactNumberContainer: 'form[action="/form-confirmation"] > div:has(> #validationCustom05[name="contactnumber"])',
+    dateContainer: 'form[action="/form-confirmation"] > div:has(> #validationCustom05[name="pickupdate"])',
+    paymentMethodContainer: 'form[action="/form-confirmation"] > div:has(> #validationCustom04)'
+  } as const;
+
   protected validationElements = {
-    contactNameField: () => cy.get('#validationCustom01'),
-    contactNumberField: () => cy.get('#validationCustom05[name="contactnumber"]'),
-    pickupDateField: () => cy.get('#validationCustom05[name="pickupdate"]'),
-    paymentMethodField: () => cy.get('#validationCustom04'),
-    submitButton: () => cy.get('form[action="/form-confirmation"] >> button[type="submit"]'),
+    contactNameField: () => cy.get(`${this.validationSelectors.contactNameField}`),
+    contactNumberField: () => cy.get(`${this.validationSelectors.contactNumberField}`),
+    pickupDateField: () => cy.get(`${this.validationSelectors.pickupDateField}`),
+    paymentMethodField: () => cy.get(`${this.validationSelectors.paymentMethodField}`),
+    submitButton: () => cy.get(`${this.validationSelectors.formAction}`)
+      .find(`${this.validationSelectors.submitButton}`),
     // Validation feedback elements
-    contactNameInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.invalid-feedback'),
-    contactNameValidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom01) > div.valid-feedback'),
-    contactNumberInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom05[name="contactnumber"]) > div.invalid-feedback'),
-    dateInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom05[name="pickupdate"]) > div.invalid-feedback'),
-    paymentMethodInvalidFeedback: () => cy.get('form[action="/form-confirmation"] > div:has(> #validationCustom04) > div.invalid-feedback')
+    contactNameInvalidFeedback: () => cy.get(`${this.validationSelectors.contactNameContainer}`)
+      .find(`${this.validationSelectors.invalidFeedback}`),
+    contactNameValidFeedback: () => cy.get(`${this.validationSelectors.contactNameContainer}`)
+      .find(`${this.validationSelectors.validFeedback}`),
+    contactNumberInvalidFeedback: () => cy.get(`${this.validationSelectors.contactNumberContainer}`)
+      .find(`${this.validationSelectors.invalidFeedback}`),
+    dateInvalidFeedback: () => cy.get(`${this.validationSelectors.dateContainer}`)
+      .find(`${this.validationSelectors.invalidFeedback}`),
+    paymentMethodInvalidFeedback: () => cy.get(`${this.validationSelectors.paymentMethodContainer}`)
+      .find(`${this.validationSelectors.invalidFeedback}`)
   };
 
   clearContactName() {
@@ -56,8 +77,12 @@ class FormValidationPage extends BasePage {
     cy.visit(`${Cypress.env('form_validation_url')}`);
   }
 
-  verifyPageLoaded() {
+  verifyPageUrl() {
     cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_validation_url')}`);
+  }
+
+  verifyPageLoaded() {
+    this.verifyPageUrl();
     this.elements.baseContainer()
       .getSelector()
       .then((selector) => {
@@ -66,7 +91,7 @@ class FormValidationPage extends BasePage {
   }
 
   verifyAllValidationErrors() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('form_validation_url')}`);
+    this.verifyPageUrl();
     this.verifyContactNameValidationError();
     this.verifyContactNumberValidationError();
     this.verifyDateValidationError();
