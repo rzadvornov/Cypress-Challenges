@@ -19,6 +19,10 @@ Given("the user views the site on a device with resolution {string}", (resolutio
   homePage.setResolution(resolution);
 });
 
+Given("the user clicks 'Add to Cart' for the book titled {string}", (title: string) => {
+  homePage.addBookToCart(title);
+});
+
 When("the user enters {string} in the search field", (searchTerm: string) => {
   homePage.enterSearchTerm(searchTerm);
 });
@@ -33,6 +37,10 @@ When("the user selects category {string} from the category filter", (categoryId:
 
 When("the user clicks on 'Sign In' button at 'Bookstore Home' page", () => {
   homePage.signIn();
+});
+
+When("the user clicks on the shopping cart icon", () => {
+  homePage.selectCart();
 });
 
 Then("the user should see the bookstore logo", () => {
@@ -60,3 +68,7 @@ Then("each result should contain {string} in the title", (searchTerm: string) =>
 });
 
 Then("the user should be redirected to bookstore Homepage", verifyHomePageLoaded);
+
+Then("the cart icon should show {string} item", (quantity: string) => {
+  homePage.verifyCartCounter(quantity);
+});

@@ -9,8 +9,9 @@ class HomePage extends BasePage {
     searchInput: '#search-input',
     searchButton: '[data-testid="search-btn"], .search-button, button[type="submit"]',
     categoryFilter: '.filter_sort',
-    cartLink: 'a[href*="cart"]',
-    cartCounter: '[data-testid="cart-count"], .cart-count, .badge',
+    cartLink: 'a[href*="bookstore/cart"]',
+    addToCartLink: 'a[href*="bookstore/add-to-cart/"]',
+    cartBadge: '.badge',
     signInButton: '[data-testid="goto-signin"]',
     paginationContainer: '#pagination'
   } as const;
@@ -23,7 +24,7 @@ class HomePage extends BasePage {
     searchButton: () => cy.get(`${this.homeSelectors.searchButton}`),
     categoryFilter: () => cy.get(`${this.homeSelectors.categoryFilter}`),
     cartIcon: () => cy.get(`${this.homeSelectors.cartLink}`),
-    cartCounter: () => cy.get(`${this.homeSelectors.cartCounter}`),
+    cartItems: () => cy.get(`${this.homeSelectors.cartBadge}`),
     signInButton: () => cy.get(`${this.homeSelectors.signInButton}`),
     paginationContainer: () => cy.get(`${this.homeSelectors.paginationContainer}`)
   };
@@ -34,34 +35,53 @@ class HomePage extends BasePage {
       .type(searchTerm);
   }
 
+  selectCart() {
+    this.homeElements.cartIcon().click();
+  }
+
   search() {
     this.homeElements.searchButton().click();
   }
 
-  selectBook(bookTitle: string) {
+  addBookToCart(bookTitle: string): void {
+    this.findAddCartButtonForBook(bookTitle).click({ force: true });
+  }
+
+  private findAddCartButtonForBook(bookTitle: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.contains('[data-testid^="title-"]', bookTitle)
+      .invoke('attr', 'data-testid')
+      .then((titleTestId) => {
+        const cartTestId = (titleTestId as string).replace('title', 'cart');
+        return cy.get(`[data-testid="${cartTestId}"]`);
+     });
+  }
+
+  selectBook(bookTitle: string): void {
+    this.findBookAndNavigate(bookTitle, ($titleElement) => {
+     const dataTestId = $titleElement.attr('data-testid');
+     return cy.get(`[data-testid="${dataTestId}"]`).parent().invoke('attr', 'href');
+    });
+  }
+
+  private findBookAndNavigate(bookTitle: string, getHrefCallback: (titleElement: JQuery<HTMLElement>) => Cypress.Chainable<string | undefined>): void {
     let foundHref: string | null = null;
     this.homeElements.bookItems().each(($book) => {
       cy.wrap($book).within(() => {
         cy.get('[data-testid^="title-"]').should('exist').then(($titleElement) => {
           const titleElementText = $titleElement.text();
           if (titleElementText.includes(bookTitle)) {
-            const dataTestId = $titleElement.attr('data-testid');
-            cy.get(`[data-testid="${dataTestId}"]`)
-            .parent()
-            .invoke('attr', 'href')
-            .then((href: string | undefined) => {
+            getHrefCallback($titleElement).then((href: string | undefined) => {
               foundHref = href || `${Cypress.env('bookstore_url')}`;
-          });
-        }
-      });
-    });
+            });
+          }
+       });
+     });
     }).then(() => {
-    // Navigate outside the within block if href was found
       if (foundHref) {
-        cy.visit(foundHref);
-      }
+       cy.visit(foundHref);
+     }
     });
-  };
+  }
 
   selectCategory(categoryId: string) {
     cy.get(`[data-testid="category-${categoryId}"]`)
@@ -169,6 +189,10 @@ class HomePage extends BasePage {
     this.homeElements.logo()
       .should('be.visible')
       .contains('All Books');
+  }
+
+  verifyCartCounter(quantity: string) {
+    this.homeElements.cartItems().contains(quantity);
   }
 }
 

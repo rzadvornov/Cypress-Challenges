@@ -8,7 +8,10 @@ class ShoppingCartPage extends BasePage {
     quantityInput: '#cartQty',
     deleteLink: 'a[href*="/bookstore/remove/"]',
     checkoutButton: '[data-testid="checkout"]',
+    table: 'table',
     tableBody: 'tbody',
+    tableRows: 'tr',
+    itemTitle: 'td.information',
     boldSpan: 'span.fw-bold',
     updateButton: 'button',
     span: 'span'
@@ -25,16 +28,37 @@ class ShoppingCartPage extends BasePage {
     totalAmount: () => cy.get(`${this.shoppingCartSelectors.checkoutButton}`)
       .parent().find(`${this.shoppingCartSelectors.span}`),
     price: () => cy.get(`${this.shoppingCartSelectors.tableBody}`)
-      .find(`${this.shoppingCartSelectors.boldSpan}`)
+      .find(`${this.shoppingCartSelectors.boldSpan}`),
+    itemTitle: () => cy.get(`${this.shoppingCartSelectors.tableBody}`)
+      .find(`${this.shoppingCartSelectors.itemTitle}`),
+    table: () => cy.get(`${this.shoppingCartSelectors.table}`),
+    tableRows: () => cy.get(`${this.shoppingCartSelectors.tableBody}`)
+      .find(`${this.shoppingCartSelectors.tableRows}`),
+    itemPrice: () => cy.get(`${this.shoppingCartSelectors.boldSpan}`)
   };
 
   setQuantity(quantity: string) {
-    this.shoppingCartElements.quantity().type(quantity);
+    this.shoppingCartElements.quantity().clear().type(quantity);
     this.shoppingCartElements.updateButton().click();
   }
 
   checkout() {
     this.shoppingCartElements.checkoutButton().click();
+  }
+
+  deleteBookFromCart(title: string) {
+    cy.contains(this.shoppingCartSelectors.itemTitle, title)
+    .closest(this.shoppingCartSelectors.tableRows)
+    .find(this.shoppingCartSelectors.deleteLink)
+    .click({force: true});
+  }
+
+  verifyCartIsCleaned() {
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Shopping Cart Page - Empty Cart', { scope: selector });
+      });
   }
 
   verifyEmptyCart() {
@@ -70,7 +94,7 @@ class ShoppingCartPage extends BasePage {
         .then((priceText) => {
           const text = priceText.replace(/[0-9\s]/g, '');
           expect(text).to.be.oneOf(currencies);
-      });
+        });
     })
   }
 
@@ -89,6 +113,81 @@ class ShoppingCartPage extends BasePage {
       .invoke('text')
       .should('eq', totalAmount);
   }
+
+  verifyTitle(title: string) {
+    this.shoppingCartElements.itemTitle().should(($titles) => {
+      const matchingTitles = $titles.filter((_index, el) =>
+        Cypress.$(el).text().includes(title)
+      )
+      expect(matchingTitles).to.have.length(1)
+    })
+  }
+
+  verifyTotalChange() {
+    this.calculateTotalAmount().then((total) => {
+      this.verifyTotalAmount(total);
+    })
+  }
+
+  private calculateTotalAmount(): Cypress.Chainable<string> {
+    const currencies = ['€', '$', '£'] as const;
+  
+    return this.shoppingCartElements.table()
+      .should('exist')
+      .then(() => this.shoppingCartElements.tableRows())
+      .should('exist')
+      .should('have.length.greaterThan', 0)
+      .then(($rows) => {
+        const calculations: Array<{ quantity: number; price: number; currency: string }> = [];
+      
+        // Process each row synchronously
+        $rows.each((_, row) => {
+          const $row = Cypress.$(row);
+          const quantityElement = $row.find(this.shoppingCartSelectors.quantityInput);
+          const priceElement = $row.find(this.shoppingCartSelectors.boldSpan);
+        
+          if (quantityElement.length && priceElement.length) {
+            const quantity = this.parseQuantity(quantityElement.val());
+            const { price, currency } = this.parsePrice(priceElement.text().trim(), currencies);
+          
+            calculations.push({ quantity, price, currency });
+          }
+        });
+      
+        return this.computeFinalTotal(calculations);
+      });
+  }
+
+  private parseQuantity(value: any): number {
+    return parseInt(String(value || '0'), 10) || 0;
+  }
+
+  private parsePrice(priceText: string, currencies: readonly string[]): { price: number; currency: string } {
+    for (const currency of currencies) {
+      if (priceText.includes(currency)) {
+        const cleanPrice = priceText.replace(currency, '').trim();
+        return {
+          price: parseFloat(cleanPrice) || 0,
+          currency
+        };
+      }
+    }
+  
+    return { price: parseFloat(priceText) || 0, currency: '' };
+  }
+
+  private computeFinalTotal(calculations: Array<{ quantity: number; price: number; currency: string }>): string {
+    if (calculations.length === 0) {
+      return '0';
+    }
+  
+    const total = calculations.reduce((sum, { quantity, price }) => sum + (quantity * price), 0);
+    const detectedCurrency = calculations.find(calc => calc.currency)?.currency || '';
+    const finalTotal = Math.round(total * 100) / 100;
+  
+    return `${finalTotal}${detectedCurrency}`;
+  }
+
 }
 
 export const shoppingCartPage = new ShoppingCartPage();
