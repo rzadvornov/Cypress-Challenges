@@ -11,16 +11,16 @@ Feature: Shopping Cart
     Given the user clicks 'Add to Cart' for the book titled 'JavaScript for Web Developers'
     Then the cart icon should show '1' item
     When the user clicks on the shopping cart icon
-    Then the cart page should load
+    Then the Cart Page should be loaded
     And the user should see 'JavaScript for Web Developers' in his cart
     And the user should see the correct price for the item
 
   Scenario: Update quantity in cart
     Given the user clicks 'Add to Cart' for the book titled 'JavaScript for Web Developers'
     When the user clicks on the shopping cart icon
-    Then the cart page should load
+    Then the Cart Page should be loaded
     When the user changes the quantity to '2'
-    Then the total price should update accordingly
+    Then the total amount should update accordingly
 
   Scenario: Remove item from cart
     Given the user clicks 'Add to Cart' for the book titled 'JavaScript for Web Developers'

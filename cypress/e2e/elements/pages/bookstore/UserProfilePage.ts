@@ -2,15 +2,12 @@ import { BasePage } from "../BasePage";
 
 class UserProfilePage extends BasePage {
   
-  private orderID: string = "";
-  
-  private readonly userProfileSelectors = {
+  private userProfileSelectors = {
     navbarDropdown: '#navbarDropdown',
     profile: '#profile',
     logout: '#logout',
     deleteOrdersButton: '#deleteOrdersBtn',
     cardFooter: '.card-footer',
-    order: `[data-testid="${this.orderID}"]`,
     totalAmountSpan: 'span'
   } as const;
 
@@ -18,10 +15,7 @@ class UserProfilePage extends BasePage {
     menu: () => cy.get(`${this.userProfileSelectors.navbarDropdown}`),
     profile: () => cy.get(`${this.userProfileSelectors.profile}`),
     logout: () => cy.get(`${this.userProfileSelectors.logout}`),
-    deleteOrdersButton: () => cy.get(`${this.userProfileSelectors.deleteOrdersButton}`),
-    totalAmount: () => cy.get(`${this.userProfileSelectors.order}`)
-      .find(`${this.userProfileSelectors.cardFooter}`)
-      .find(`${this.userProfileSelectors.totalAmountSpan}`)
+    deleteOrdersButton: () => cy.get(`${this.userProfileSelectors.deleteOrdersButton}`)
   }
   
   logout() {
@@ -53,22 +47,28 @@ class UserProfilePage extends BasePage {
   }
 
   verifyTotalAmount(totalAmount: string) {
-    this.userProfileElements.totalAmount()
+    cy.get('@extractedOrderID').then((orderID) => {
+      cy.get(`[data-testid="${orderID}"]`)
+      .find(`${this.userProfileSelectors.cardFooter}`)
+      .find(`${this.userProfileSelectors.totalAmountSpan}`)
       .should('be.visible')
       .invoke('text')
       .should('eq', totalAmount);
+    })
+    
   }
 
-  verifyNotification() {
+  private verifyNotification() {
     this.getAlert()
       .should('be.visible')
-      .and('contain', 'Your purchase was successful!')
+      .and('contain', 'Your purchase was successful! Thank you for your order.')
       .invoke('text')
       .then((text) => {
-        const match = text.match(/Reference ID:\s*([A-Za-z0-9]+)/);
+        const match = text.match(/Reference ID: ([a-f0-9]+)/i);
         if (match && match[1]) {
-          this.orderID = match[1].trim();
-          cy.log(`Extracted Order ID: ${this.orderID}`);
+          const orderID = match[1].trim();
+          cy.log(`Extracted Order ID: ${orderID}`);
+          cy.wrap(orderID).as('extractedOrderID');
         } else {
           throw new Error('Could not extract Reference ID from alert text');
         }

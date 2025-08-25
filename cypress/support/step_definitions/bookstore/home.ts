@@ -5,9 +5,11 @@ const verifyHomePageLoaded = () => {
   homePage.verifyPageLoaded();
 };
 
-Given("the user is on the bookstore Homepage", () => {
+const navigateToHomePage = () => {
   homePage.visit();
-});
+};
+
+Given("the user is on the bookstore Homepage", navigateToHomePage);
 
 Given("the bookstore Homepage has loaded completely", verifyHomePageLoaded);
 
@@ -72,3 +74,5 @@ Then("the user should be redirected to bookstore Homepage", verifyHomePageLoaded
 Then("the cart icon should show {string} item", (quantity: string) => {
   homePage.verifyCartCounter(quantity);
 });
+
+Then("the user navigates to Home Page", navigateToHomePage);

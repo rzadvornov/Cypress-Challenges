@@ -11,7 +11,8 @@ class CheckoutPage extends BasePage {
     expirationMonthSelect: '#card-expiry-month',
     expirationYearSelect: '#card-expiry-year',
     cardCVCInput: '#card-cvc',
-    purchaseButton: '[data-testid="purchase"]'
+    purchaseButton: '[data-testid="purchase"]',
+    errorNotification: '#charge-error'
   } as const;
 
   protected checkoutElements = {
@@ -23,7 +24,8 @@ class CheckoutPage extends BasePage {
     expirationMonth: () => cy.get(`${this.checkoutSelectors.expirationMonthSelect}`),
     expirationYear: () => cy.get(`${this.checkoutSelectors.expirationYearSelect}`),
     cardCVC: () => cy.get(`${this.checkoutSelectors.cardCVCInput}`),
-    purchaseButton: () => cy.get(`${this.checkoutSelectors.purchaseButton}`)
+    purchaseButton: () => cy.get(`${this.checkoutSelectors.purchaseButton}`),
+    errorNotification: () => cy.get(`${this.checkoutSelectors.errorNotification}`)
   };
 
   fillName(name: string) {
@@ -90,6 +92,12 @@ class CheckoutPage extends BasePage {
       .should('be.visible')
       .invoke('text')
       .should('eq', totalAmount);
+  }
+
+  verifyErrorNotification() {
+    this.checkoutElements.errorNotification()
+      .should('be.visible')
+      .contains('Your card was declined.');
   }
 }
 

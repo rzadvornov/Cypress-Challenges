@@ -9,7 +9,11 @@ When("the user clicks 'Delete' button for {string}", (title: string) => {
   shoppingCartPage.deleteBookFromCart(title);
 });
 
-Then("the cart page should load", () => {
+When("the user clicks 'Proceed To Checkout' button", () => {
+  shoppingCartPage.checkout();
+});
+
+Then("the Cart Page should be loaded", () => {
   shoppingCartPage.verifyPageLoaded();
 });
 
@@ -21,7 +25,7 @@ Then("the user should see the correct price for the item", () => {
   shoppingCartPage.verifyPrice();
 });
 
-Then("the total price should update accordingly", () => {
+Then("the total amount should update accordingly", () => {
   shoppingCartPage.verifyTotalChange();
 });
 

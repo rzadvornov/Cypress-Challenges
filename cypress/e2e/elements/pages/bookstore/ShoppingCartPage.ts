@@ -2,6 +2,8 @@ import { BasePage } from "../BasePage";
 
 class ShoppingCartPage extends BasePage {
   
+  private totalOrderAmount: string = "";
+
   private readonly shoppingCartSelectors = {
     shoppingCartHeader: 'h1',
     emptyCartHeader: 'h2',
@@ -14,7 +16,7 @@ class ShoppingCartPage extends BasePage {
     itemTitle: 'td.information',
     boldSpan: 'span.fw-bold',
     updateButton: 'button',
-    span: 'span'
+    span: 'span.text-danger'
   } as const;
 
   protected shoppingCartElements = {
@@ -37,9 +39,8 @@ class ShoppingCartPage extends BasePage {
     itemPrice: () => cy.get(`${this.shoppingCartSelectors.boldSpan}`)
   };
 
-  setQuantity(quantity: string) {
-    this.shoppingCartElements.quantity().clear().type(quantity);
-    this.shoppingCartElements.updateButton().click();
+  getTotalOrderAmount() {
+    return this.totalOrderAmount;
   }
 
   checkout() {
@@ -51,6 +52,11 @@ class ShoppingCartPage extends BasePage {
     .closest(this.shoppingCartSelectors.tableRows)
     .find(this.shoppingCartSelectors.deleteLink)
     .click({force: true});
+  }
+
+  setQuantity(quantity: string) {
+    this.shoppingCartElements.quantity().clear().type(quantity);
+    this.shoppingCartElements.updateButton().click();
   }
 
   verifyCartIsCleaned() {
@@ -125,6 +131,7 @@ class ShoppingCartPage extends BasePage {
 
   verifyTotalChange() {
     this.calculateTotalAmount().then((total) => {
+      this.totalOrderAmount = total;
       this.verifyTotalAmount(total);
     })
   }
@@ -183,11 +190,21 @@ class ShoppingCartPage extends BasePage {
   
     const total = calculations.reduce((sum, { quantity, price }) => sum + (quantity * price), 0);
     const detectedCurrency = calculations.find(calc => calc.currency)?.currency || '';
-    const finalTotal = Math.round(total * 100) / 100;
-  
+    const finalTotal = this.roundWithZeros(total, 2);
     return `${finalTotal}${detectedCurrency}`;
   }
 
+  private roundWithZeros(num: number, decimalPlaces: number = 2): string {
+    if (typeof num !== 'number' || isNaN(num)) {
+        throw new TypeError('First argument must be a valid number');
+    }
+    
+    if (!Number.isInteger(decimalPlaces) || decimalPlaces < 0) {
+        throw new TypeError('Decimal places must be a non-negative integer');
+    }
+    
+    return num.toFixed(decimalPlaces);
+  }
 }
 
 export const shoppingCartPage = new ShoppingCartPage();
