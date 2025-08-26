@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { registrationPage } from "../../e2e/elements/pages/RegistrationPage";
+import { registrationPage } from "../../e2e/ui/pages/RegistrationPage";
 import { StringUtils } from "../utilities/StringUtils";
 
 const verifyRegistrationPage = () => {

@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { notFoundPage } from "../../../e2e/elements/pages/bookstore/NotFoundPage";
+import { notFoundPage } from "../../../e2e/ui/pages/bookstore/NotFoundPage";
 
 Given("the user navigates to a non-existent page", () => {
   notFoundPage.visitNotExistedPage(`/bookstore/non-existent-page`);

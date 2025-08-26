@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { dialogsPage } from "../../e2e/elements/pages/DialogsPage";
+import { dialogsPage } from "../../e2e/ui/pages/DialogsPage";
 
 Given("the user is on the Dialogs practice page", () => {
   dialogsPage.visit();

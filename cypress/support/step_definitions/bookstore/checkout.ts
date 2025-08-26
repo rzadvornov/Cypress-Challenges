@@ -1,5 +1,5 @@
 import { Then, DataTable, When } from "@badeball/cypress-cucumber-preprocessor";
-import { checkoutPage } from "../../../e2e/elements/pages/bookstore/CheckoutPage";
+import { checkoutPage } from "../../../e2e/ui/pages/bookstore/CheckoutPage";
 
 When("the user clicks 'Purchase' button", () => {
   checkoutPage.purchase();

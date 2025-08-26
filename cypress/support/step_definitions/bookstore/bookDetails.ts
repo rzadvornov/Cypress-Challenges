@@ -1,5 +1,5 @@
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { bookDetailsPage } from "../../../e2e/elements/pages/bookstore/BookDetailsPage";
+import { bookDetailsPage } from "../../../e2e/ui/pages/bookstore/BookDetailsPage";
 
 When("the user clicks the 'Add to Cart' button", () => {
   bookDetailsPage.clickAddToCartButton();

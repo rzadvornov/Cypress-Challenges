@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { shadowDomPage } from "../../e2e/elements/pages/ShadowDomPage";
+import { shadowDomPage } from "../../e2e/ui/pages/ShadowDomPage";
 
 Given("the user is on the Shadow DOM page", () => {
   shadowDomPage.visit();

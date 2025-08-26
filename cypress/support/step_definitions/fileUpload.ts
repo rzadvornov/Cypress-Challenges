@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { fileUploadPage } from "../../e2e/elements/pages/FileUploadPage";
+import { fileUploadPage } from "../../e2e/ui/pages/FileUploadPage";
 
 beforeEach(() => {
   cy.task('cleanupTestFiles');

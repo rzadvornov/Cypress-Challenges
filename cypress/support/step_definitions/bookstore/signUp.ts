@@ -1,6 +1,6 @@
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor";
-import { signUpPage } from "../../../e2e/elements/pages/bookstore/SignUpPage";
-import { signInPage } from "../../../e2e/elements/pages/bookstore/SignInPage";
+import { signUpPage } from "../../../e2e/ui/pages/bookstore/SignUpPage";
+import { signInPage } from "../../../e2e/ui/pages/bookstore/SignInPage";
 
 Given("the user has registered account", () => {
   signUpPage.registerUser();

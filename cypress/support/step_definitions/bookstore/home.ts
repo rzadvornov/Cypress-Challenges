@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { homePage } from "../../../e2e/elements/pages/bookstore/HomePage";
+import { homePage } from "../../../e2e/ui/pages/bookstore/HomePage";
 
 const verifyHomePageLoaded = () => {
   homePage.verifyPageLoaded();

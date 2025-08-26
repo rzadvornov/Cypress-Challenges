@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { dragAndDropPage } from "../../e2e/elements/pages/DragAndDropPage";
+import { dragAndDropPage } from "../../e2e/ui/pages/DragAndDropPage";
 
 const verifyElement = (element: string) => {
   dragAndDropPage.verifyElement(element);

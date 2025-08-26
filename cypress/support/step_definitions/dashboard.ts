@@ -1,6 +1,6 @@
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { dashboardPage } from "../../e2e/elements/pages/DashboardPage";
-import { loginPage } from "../../e2e/elements/pages/LoginPage";
+import { dashboardPage } from "../../e2e/ui/pages/DashboardPage";
+import { loginPage } from "../../e2e/ui/pages/LoginPage";
 
 const verifyDisconnectedSession = () => {
   dashboardPage.verifyDisconnectedSession();

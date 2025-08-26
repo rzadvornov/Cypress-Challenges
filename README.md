@@ -57,8 +57,9 @@ npx cypress open
 ```
 cypress/
 ├── e2e/                    # Test files
-│   ├── elements/
+│   ├── ui/
 │   │   └── /pages # Page Object Models
+|   |---api/ # API methods to work with endpoints
 ├── features/               # BDD Scenarios
 ├── fixtures/               # Test data
 ├── support/                # Custom commands and utilities
@@ -274,54 +275,98 @@ percy exec -- cypress run --browser chrome
 ### Base Page Class
 
 ```typescript
-// cypress/e2e/elements/pages/BasePage.ts
+// cypress/e2e/ui/pages/BasePage.ts
 export abstract class BasePage {
+  
+  private readonly baseSelectors = {
+    coreContainer: '#core',
+    usernameInput: '#username',
+    passwordInput: '#password',
+    flashAlert: '#flash',
+    flashCloseButton: '#flash > button'
+  } as const;
+
+  protected elements = {
+    baseContainer: () => cy.get(`${this.baseSelectors.coreContainer}`),
+    username: () => cy.get(`${this.baseSelectors.usernameInput}`),
+    password: () => cy.get(`${this.baseSelectors.passwordInput}`),
+    alert: () => cy.get(`${this.baseSelectors.flashAlert}`),
+    alertCloseButton: () => cy.get(`${this.baseSelectors.flashCloseButton}`)
+  };
+
+  abstract verifyPageLoaded(): void;
+
+  fillUsername(value: string) {
+    this.elements.username()
+      .clear()
+      .type(value);
+    return this;
+  }
+
+  fillPassword(value: string) {
+    this.elements.password()
+      .clear()
+      .type(value);
+    return this;
+  }
 
   getAlert() {
-    return cy.get(`#flash`);
+    return this.elements.alert();
   }
 
   closeAlert() {
-    cy.get(`#flash > button`).click();
+    this.elements.alertCloseButton().click();
   }
-
 }
 ```
 
 ### Login Page Example
 
 ```typescript
-// /e2e/elements/pages/LoginPage.ts
+// /e2e/ui/pages/LoginPage.ts
 import { BasePage } from "./BasePage";
+import { Singleton } from "../../../support/utilities/Decorators";
 
+@Singleton
 class LoginPage extends BasePage {
   
-  private static instance: LoginPage;
+  private readonly loginSelectors = {
+    coreContainer: '#core',
+    listItems: 'ul > li',
+    loginForm: '#login',
+    submitButton: 'button'
+  } as const;
+
+  protected loginElements = {
+    coreContainer: () => cy.get(`${this.loginSelectors.coreContainer}`),
+    credentialsListItems: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`),
+    usernameListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`).contains('Username:'),
+    passwordListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
+      .find(`${this.loginSelectors.listItems}`).contains('Password:'),
+    submitButton: () => cy.get(`${this.loginSelectors.loginForm}`)
+      .find(`${this.loginSelectors.submitButton}`)
+  };
+
   #username: string;
   #password: string;
   
-  private constructor(username: string, password: string) {
+  constructor(username: string, password: string) {
     super();
     this.#username = username;
     this.#password = password;
   }
 
-  public static getInstance(): LoginPage {
-    if (!LoginPage.instance) {
-      LoginPage.instance = new LoginPage("", "");
-    }
-    return LoginPage.instance;
-  }
-
   #setValidUsernameFromPage() {
-    cy.get(`#core`).find(`ul > li`).contains('Username:').invoke('text').then((text) => {
+    this.loginElements.usernameListItem().invoke('text').then((text) => {
       this.#username = text.toString().replace(/Username:/g, '').trim();    
     });
     return this.#username;
   }
 
   #setValidPasswordFromPage() {
-    cy.get(`#core`).find(`ul > li`).contains('Password:').invoke('text').then((text) => {
+    this.loginElements.passwordListItem().invoke('text').then((text) => {
         this.#password = text.toString().replace(/Password:/g, '').trim();
     });
     return this.#password;
@@ -340,44 +385,34 @@ class LoginPage extends BasePage {
     this.#setValidUsernameFromPage();
     this.#setValidPasswordFromPage();
   }
-  
-  fillUsername(value) {
-    const field = cy.get(`#username`);
-    field.clear();
-    field.type(value);
-    
-    return this;
-  }
-
-  fillPassword(value) {
-    const field = cy.get(`#password`);
-    field.clear();
-    field.type(value);
-    
-    return this;
-  }
 
   submit() {
-    cy.get(`#login > button`).click();
+    this.loginElements.submitButton().click();
+  }
+
+  verifyPageUrl() {
+    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('login_url')}`);
   }
 
   verifyPageLoaded() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/login`);
-    cy.shouldExistAndBeVisible('#username');
-    cy.shouldExistAndBeVisible('#password');
-    cy.shouldExistAndBeVisible('#login > button');
+    this.verifyPageUrl();
+    this.elements.baseContainer()
+      .getSelector()
+      .then((selector) => {
+        cy.percySnapshot('Login Page', { scope: selector });
+      });
   }
 
   verifyEmptyUsername() {
-    cy.get(`#username`).invoke('val').should('have.lengthOf', 0);
+    this.elements.username().invoke('val').should('have.lengthOf', 0);
   }
 
   verifyEmptyPassword() {
-    cy.get(`#password`).invoke('val').should('have.lengthOf', 0);
+    this.elements.password().invoke('val').should('have.lengthOf', 0);
   }
 }
 
-export const loginPage = LoginPage.getInstance();
+export const loginPage = new LoginPage("", "");
 ```
 
 ### Using Page Objects in Tests
