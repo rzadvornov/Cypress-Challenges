@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { loginPage } from "../../e2e/ui/pages/LoginPage";
+import { loginPage } from "../../../e2e/ui/pages/LoginPage";
 
 const verifyLoginPage = () => {
   loginPage.verifyPageLoaded();
@@ -7,7 +7,7 @@ const verifyLoginPage = () => {
 
 Given("the user is on the Login page", () => {
   loginPage.visit();
-}); 
+});
 
 Given("the login form is displayed", verifyLoginPage);
 
@@ -35,11 +35,14 @@ Then("the user should be redirected to Login page", verifyLoginPage);
 
 Then("the user should remain on the Login page", verifyLoginPage);
 
-Then("an error message {string} should be displayed", function (alertMessage: string) {
+Then(
+  "an error message {string} should be displayed",
+  function (alertMessage: string) {
     const alert = loginPage.getAlert();
-    alert.should('have.css', 'background-color', 'rgb(248, 215, 218)');
+    alert.should("have.css", "background-color", "rgb(248, 215, 218)");
     alert.contains(alertMessage);
-});
+  }
+);
 
 Then("the username field should be cleared", () => {
   loginPage.verifyEmptyUsername();

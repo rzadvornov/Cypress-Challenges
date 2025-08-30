@@ -46,30 +46,34 @@ declare global {
        * @example cy.getShadowElement('[data-cy="shadow-host"]')
        */
       getShadowElement(selector: string): Chainable<JQuery<HTMLElement>>;
-      
+
       /**
        * Custom command to find element within shadow DOM using CSS piercing
        * @param selector CSS selector that pierces shadow boundaries
        * @returns Cypress chainable object
        * @example cy.getShadowElementByPiercing('shadow-host >>> button')
        */
-      getShadowElementByPiercing(selector: string): Chainable<JQuery<HTMLElement>>;
-      
+      getShadowElementByPiercing(
+        selector: string
+      ): Chainable<JQuery<HTMLElement>>;
+
       /**
        * Custom command to traverse nested shadow DOM
        * @param selectors Array of selectors for each shadow level
        * @returns Cypress chainable object
        * @example cy.getNestedShadowElement(['host1', 'host2', 'target'])
        */
-      getNestedShadowElement(selectors: string[]): Chainable<JQuery<HTMLElement>>;
-      
+      getNestedShadowElement(
+        selectors: string[]
+      ): Chainable<JQuery<HTMLElement>>;
+
       /**
        * Custom command to check if element has shadow root
        * @param selector CSS selector for potential shadow host
        * @example cy.hasShadowRoot('[data-cy="shadow-host"]')
        */
       hasShadowRoot(selector: string): Chainable<JQuery<HTMLElement>>;
-      
+
       /**
        * Custom command to get shadow root mode
        * @param selector CSS selector for shadow host
@@ -77,7 +81,7 @@ declare global {
        * @example cy.getShadowRootMode('[data-cy="shadow-host"]').should('equal', 'open')
        */
       getShadowRootMode(selector: string): Chainable<string>;
-      
+
       /**
        * Custom command to check if element has shadow root and verify its accessibility
        * @param selector CSS selector for shadow host
@@ -85,11 +89,11 @@ declare global {
        * @example cy.verifyShadowRoot('[data-cy="shadow-host"]')
        */
       verifyShadowRoot(selector: string): Chainable<JQuery<HTMLElement>>;
-      
+
       /**
-      * Custom command to get the optimal selector for an element using Cypress SelectorPlayground
-      * @example cy.get('#my-element').getSelector()
-      */
+       * Custom command to get the optimal selector for an element using Cypress SelectorPlayground
+       * @example cy.get('#my-element').getSelector()
+       */
       getSelector(): Chainable<string>;
     }
   }
@@ -100,18 +104,22 @@ declare global {
  * @param {JQuery} $element - The jQuery element object
  * @returns {Chainable<string>} The optimal selector for the element wrapped in a Cypress chainable
  */
-Cypress.Commands.add('getSelector', { prevSubject: ['element'] }, ($element) => {
-  const selector = Cypress.SelectorPlayground.getSelector($element);
-  cy.log(`The selector for this element is: ${selector}`);
-  return cy.wrap(selector);
-});
+Cypress.Commands.add(
+  "getSelector",
+  { prevSubject: ["element"] },
+  ($element) => {
+    const selector = Cypress.SelectorPlayground.getSelector($element);
+    cy.log(`The selector for this element is: ${selector}`);
+    return cy.wrap(selector);
+  }
+);
 
 /**
  * Custom command to pierce through Shadow DOM
  * @param {string} selector - CSS selector for the shadow host
  * @returns {Chainable} Cypress chainable object
  */
-Cypress.Commands.add('getShadowElement', (selector) => {
+Cypress.Commands.add("getShadowElement", (selector) => {
   return cy.get(selector).shadow();
 });
 
@@ -120,7 +128,7 @@ Cypress.Commands.add('getShadowElement', (selector) => {
  * @param {string} selector - CSS selector that pierces shadow boundaries
  * @returns {Chainable} Cypress chainable object
  */
-Cypress.Commands.add('getShadowElementByPiercing', (selector) => {
+Cypress.Commands.add("getShadowElementByPiercing", (selector) => {
   return cy.get(selector, { includeShadowDom: true });
 });
 
@@ -129,20 +137,20 @@ Cypress.Commands.add('getShadowElementByPiercing', (selector) => {
  * @param {string[]} selectors - Array of selectors for each shadow level
  * @returns {Chainable} Cypress chainable object
  */
-Cypress.Commands.add('getNestedShadowElement', (selectors) => {
+Cypress.Commands.add("getNestedShadowElement", (selectors) => {
   if (!Array.isArray(selectors)) {
-    throw new Error('Expected selectors to be an array');
+    throw new Error("Expected selectors to be an array");
   }
-  
+
   if (selectors.length === 0) {
-    throw new Error('selectors array cannot be empty');
+    throw new Error("selectors array cannot be empty");
   }
-  
+
   if (selectors.length === 1) {
     // No shadow DOM traversal needed
     return cy.get(selectors[0]);
   }
-  
+
   // Start with the host element
   return selectors.slice(1).reduce((chain, selector) => {
     return chain.shadow().find(selector);
@@ -153,7 +161,7 @@ Cypress.Commands.add('getNestedShadowElement', (selectors) => {
  * Custom command to check if element has shadow root
  * @param {string} selector - CSS selector for potential shadow host
  */
-Cypress.Commands.add('hasShadowRoot', (selector) => {
+Cypress.Commands.add("hasShadowRoot", (selector) => {
   return cy.get(selector).then(($el) => {
     const element = $el[0];
     expect(element.shadowRoot).to.not.be.null;
@@ -165,16 +173,14 @@ Cypress.Commands.add('hasShadowRoot', (selector) => {
  * @param {string} selector - CSS selector for shadow host
  * @returns {Chainable} Cypress chainable object with shadow root mode
  */
-Cypress.Commands.add('getShadowRootMode', (selector) => {
+Cypress.Commands.add("getShadowRootMode", (selector) => {
   return cy.get(selector).then(($el) => {
     const element = $el[0];
     if (element.shadowRoot) {
-      return cy.wrap('open');
+      return cy.wrap("open");
     } else {
       // Check if shadowRoot is explicitly null or undefined
-      return cy.wrap(element.shadowRoot === null ? 'null' : 'closed');
+      return cy.wrap(element.shadowRoot === null ? "null" : "closed");
     }
-  });  
-
-  
+  });
 });

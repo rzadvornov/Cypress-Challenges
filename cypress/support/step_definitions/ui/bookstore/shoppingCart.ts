@@ -1,5 +1,5 @@
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { shoppingCartPage } from "../../../e2e/ui/pages/bookstore/ShoppingCartPage";
+import { shoppingCartPage } from "../../../../e2e/ui/pages/bookstore/ShoppingCartPage";
 
 When("the user changes the quantity to {string}", (quantity: string) => {
   shoppingCartPage.setQuantity(quantity);

@@ -1,6 +1,6 @@
 import { Given, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { userProfilePage } from "../../../e2e/ui/pages/bookstore/UserProfilePage";
-import { shoppingCartPage } from "../../../e2e/ui/pages/bookstore/ShoppingCartPage";
+import { userProfilePage } from "../../../../e2e/ui/pages/bookstore/UserProfilePage";
+import { shoppingCartPage } from "../../../../e2e/ui/pages/bookstore/ShoppingCartPage";
 
 Given("the user is logged out", () => {
   userProfilePage.logout();

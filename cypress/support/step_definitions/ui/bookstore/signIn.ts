@@ -1,5 +1,5 @@
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { signInPage } from "../../../e2e/ui/pages/bookstore/SignInPage";
+import { signInPage } from "../../../../e2e/ui/pages/bookstore/SignInPage";
 
 When("the user clicks on 'Sign Up' button at 'Sign In' page", () => {
   signInPage.register();

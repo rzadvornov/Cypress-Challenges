@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { shadowDomPage } from "../../e2e/ui/pages/ShadowDomPage";
+import { shadowDomPage } from "../../../e2e/ui/pages/ShadowDomPage";
 
 Given("the user is on the Shadow DOM page", () => {
   shadowDomPage.visit();
@@ -29,7 +29,7 @@ Then("user should be able to identify the shadow DOM host element", () => {
   shadowDomPage.verifyShadowHost();
 });
 
-Then('the host element should have a shadow root attached', () => {
+Then("the host element should have a shadow root attached", () => {
   shadowDomPage.verifyShadowRoot();
 });
 

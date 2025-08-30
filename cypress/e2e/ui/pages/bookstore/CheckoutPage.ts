@@ -1,73 +1,62 @@
 import { BasePage } from "../BasePage";
 
 class CheckoutPage extends BasePage {
-  
   private readonly checkoutSelectors = {
-    totalAmountHeader: 'h2',
-    nameInput: '#name',
-    addressInput: '#address',
-    cardHolderNameInput: '#card-name',
-    cardNumberInput: '#card-number',
-    expirationMonthSelect: '#card-expiry-month',
-    expirationYearSelect: '#card-expiry-year',
-    cardCVCInput: '#card-cvc',
+    totalAmountHeader: "h2",
+    nameInput: "#name",
+    addressInput: "#address",
+    cardHolderNameInput: "#card-name",
+    cardNumberInput: "#card-number",
+    expirationMonthSelect: "#card-expiry-month",
+    expirationYearSelect: "#card-expiry-year",
+    cardCVCInput: "#card-cvc",
     purchaseButton: '[data-testid="purchase"]',
-    errorNotification: '#charge-error'
+    errorNotification: "#charge-error",
   } as const;
 
   protected checkoutElements = {
     totalAmount: () => cy.get(`${this.checkoutSelectors.totalAmountHeader}`),
     name: () => cy.get(`${this.checkoutSelectors.nameInput}`),
     address: () => cy.get(`${this.checkoutSelectors.addressInput}`),
-    cardHolderName: () => cy.get(`${this.checkoutSelectors.cardHolderNameInput}`),
+    cardHolderName: () =>
+      cy.get(`${this.checkoutSelectors.cardHolderNameInput}`),
     cardNumber: () => cy.get(`${this.checkoutSelectors.cardNumberInput}`),
-    expirationMonth: () => cy.get(`${this.checkoutSelectors.expirationMonthSelect}`),
-    expirationYear: () => cy.get(`${this.checkoutSelectors.expirationYearSelect}`),
+    expirationMonth: () =>
+      cy.get(`${this.checkoutSelectors.expirationMonthSelect}`),
+    expirationYear: () =>
+      cy.get(`${this.checkoutSelectors.expirationYearSelect}`),
     cardCVC: () => cy.get(`${this.checkoutSelectors.cardCVCInput}`),
     purchaseButton: () => cy.get(`${this.checkoutSelectors.purchaseButton}`),
-    errorNotification: () => cy.get(`${this.checkoutSelectors.errorNotification}`)
+    errorNotification: () =>
+      cy.get(`${this.checkoutSelectors.errorNotification}`),
   };
 
   fillName(name: string) {
-    this.checkoutElements.name()
-      .clear()
-      .type(name);
+    this.checkoutElements.name().clear().type(name);
   }
 
   fillAddress(address: string) {
-    this.checkoutElements.address()
-      .clear()
-      .type(address);
+    this.checkoutElements.address().clear().type(address);
   }
 
   fillCardHolderName(cardHolderName: string) {
-    this.checkoutElements.cardHolderName()
-      .clear()
-      .type(cardHolderName);
+    this.checkoutElements.cardHolderName().clear().type(cardHolderName);
   }
 
   fillCardNumber(cardNumber: string) {
-    this.checkoutElements.cardNumber()
-      .clear()
-      .type(cardNumber);
+    this.checkoutElements.cardNumber().clear().type(cardNumber);
   }
 
   fillCardExpirationMonth(expirationMonth: string) {
-    this.checkoutElements.expirationMonth()
-      .clear()
-      .type(expirationMonth);
+    this.checkoutElements.expirationMonth().clear().type(expirationMonth);
   }
 
   fillExpirationYear(expirationYear: string) {
-    this.checkoutElements.expirationYear()
-      .clear()
-      .type(expirationYear);
+    this.checkoutElements.expirationYear().clear().type(expirationYear);
   }
 
   fillCardCVC(cardCVC: string) {
-    this.checkoutElements.cardCVC()
-      .clear()
-      .type(cardCVC);
+    this.checkoutElements.cardCVC().clear().type(cardCVC);
   }
 
   purchase() {
@@ -75,29 +64,37 @@ class CheckoutPage extends BasePage {
   }
 
   verifyPageUrl() {
-    cy.url().should('include', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}${Cypress.env('checkout_url')}`);
+    cy.url().should(
+      "include",
+      `${Cypress.config().baseUrl}${Cypress.env("bookstore_url")}${Cypress.env(
+        "checkout_url"
+      )}`
+    );
   }
 
   verifyPageLoaded(): void {
     this.verifyPageUrl();
-    this.elements.baseContainer()
+    this.elements
+      .baseContainer()
       .getSelector()
       .then((selector) => {
-        cy.percySnapshot('Checkout Page', { scope: selector });
+        cy.percySnapshot("Checkout Page", { scope: selector });
       });
   }
-  
+
   verifyTotalAmount(totalAmount: string) {
-    this.checkoutElements.totalAmount()
-      .should('be.visible')
-      .invoke('text')
-      .should('eq', totalAmount);
+    this.checkoutElements
+      .totalAmount()
+      .should("be.visible")
+      .invoke("text")
+      .should("eq", totalAmount);
   }
 
   verifyErrorNotification() {
-    this.checkoutElements.errorNotification()
-      .should('be.visible')
-      .contains('Your card was declined.');
+    this.checkoutElements
+      .errorNotification()
+      .should("be.visible")
+      .contains("Your card was declined.");
   }
 }
 

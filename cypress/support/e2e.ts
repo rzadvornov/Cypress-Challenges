@@ -14,10 +14,10 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands';
-import '@4tw/cypress-drag-drop';
-import '@percy/cypress';
+import "./commands";
+import "@4tw/cypress-drag-drop";
+import "@percy/cypress";
 
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on("uncaught:exception", (err, runnable) => {
   return false;
 });

@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { dialogsPage } from "../../e2e/ui/pages/DialogsPage";
+import { dialogsPage } from "../../../e2e/ui/pages/DialogsPage";
 
 Given("the user is on the Dialogs practice page", () => {
   dialogsPage.visit();
@@ -11,7 +11,7 @@ Given("the user have configured confirm handling to accept", () => {
 
 Given("the user have configured confirm handling to dismiss", () => {
   dialogsPage.setupJsConfirmationHanding(false);
-})
+});
 
 Given("the Dialogs page has loaded completely", () => {
   dialogsPage.verifyPageLoaded();
@@ -21,9 +21,12 @@ Given("the user have set up alert handling", () => {
   dialogsPage.setupJsAlertHanding();
 });
 
-Given("the user have configured prompt handling to return {string}", (message: string) => {
-  dialogsPage.setupJsPromptHanding(message);
-});
+Given(
+  "the user have configured prompt handling to return {string}",
+  (message: string) => {
+    dialogsPage.setupJsPromptHanding(message);
+  }
+);
 
 Given("the user have configured prompt handling to dismiss", () => {
   dialogsPage.setupJsPromptHanding(null);
@@ -56,4 +59,3 @@ Then("the prompt dialog should be triggered", () => {
 Then("the Dialogs page should display {string}", (message: string) => {
   dialogsPage.verifyDialogResponse(message);
 });
-

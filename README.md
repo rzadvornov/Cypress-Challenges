@@ -44,6 +44,8 @@ npm install --save-dev @4tw/cypress-drag-drop
 # Install additional libraries
 npm install --save-dev @faker-js/faker
 npm install --save-dev @percy/cli @percy/cypress
+npm install status-code-enum
+npm install http-method-enum
 ```
 
 ### 2. Initialize Cypress
@@ -277,13 +279,12 @@ percy exec -- cypress run --browser chrome
 ```typescript
 // cypress/e2e/ui/pages/BasePage.ts
 export abstract class BasePage {
-  
   private readonly baseSelectors = {
-    coreContainer: '#core',
-    usernameInput: '#username',
-    passwordInput: '#password',
-    flashAlert: '#flash',
-    flashCloseButton: '#flash > button'
+    coreContainer: "#core",
+    usernameInput: "#username",
+    passwordInput: "#password",
+    flashAlert: "#flash",
+    flashCloseButton: "#flash > button",
   } as const;
 
   protected elements = {
@@ -291,22 +292,18 @@ export abstract class BasePage {
     username: () => cy.get(`${this.baseSelectors.usernameInput}`),
     password: () => cy.get(`${this.baseSelectors.passwordInput}`),
     alert: () => cy.get(`${this.baseSelectors.flashAlert}`),
-    alertCloseButton: () => cy.get(`${this.baseSelectors.flashCloseButton}`)
+    alertCloseButton: () => cy.get(`${this.baseSelectors.flashCloseButton}`),
   };
 
   abstract verifyPageLoaded(): void;
 
   fillUsername(value: string) {
-    this.elements.username()
-      .clear()
-      .type(value);
+    this.elements.username().clear().type(value);
     return this;
   }
 
   fillPassword(value: string) {
-    this.elements.password()
-      .clear()
-      .type(value);
+    this.elements.password().clear().type(value);
     return this;
   }
 
@@ -329,29 +326,38 @@ import { Singleton } from "../../../support/utilities/Decorators";
 
 @Singleton
 class LoginPage extends BasePage {
-  
   private readonly loginSelectors = {
-    coreContainer: '#core',
-    listItems: 'ul > li',
-    loginForm: '#login',
-    submitButton: 'button'
+    coreContainer: "#core",
+    listItems: "ul > li",
+    loginForm: "#login",
+    submitButton: "button",
   } as const;
 
   protected loginElements = {
     coreContainer: () => cy.get(`${this.loginSelectors.coreContainer}`),
-    credentialsListItems: () => cy.get(`${this.loginSelectors.coreContainer}`)
-      .find(`${this.loginSelectors.listItems}`),
-    usernameListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
-      .find(`${this.loginSelectors.listItems}`).contains('Username:'),
-    passwordListItem: () => cy.get(`${this.loginSelectors.coreContainer}`)
-      .find(`${this.loginSelectors.listItems}`).contains('Password:'),
-    submitButton: () => cy.get(`${this.loginSelectors.loginForm}`)
-      .find(`${this.loginSelectors.submitButton}`)
+    credentialsListItems: () =>
+      cy
+        .get(`${this.loginSelectors.coreContainer}`)
+        .find(`${this.loginSelectors.listItems}`),
+    usernameListItem: () =>
+      cy
+        .get(`${this.loginSelectors.coreContainer}`)
+        .find(`${this.loginSelectors.listItems}`)
+        .contains("Username:"),
+    passwordListItem: () =>
+      cy
+        .get(`${this.loginSelectors.coreContainer}`)
+        .find(`${this.loginSelectors.listItems}`)
+        .contains("Password:"),
+    submitButton: () =>
+      cy
+        .get(`${this.loginSelectors.loginForm}`)
+        .find(`${this.loginSelectors.submitButton}`),
   };
 
   #username: string;
   #password: string;
-  
+
   constructor(username: string, password: string) {
     super();
     this.#username = username;
@@ -359,29 +365,45 @@ class LoginPage extends BasePage {
   }
 
   #setValidUsernameFromPage() {
-    this.loginElements.usernameListItem().invoke('text').then((text) => {
-      this.#username = text.toString().replace(/Username:/g, '').trim();    
-    });
+    this.loginElements
+      .usernameListItem()
+      .invoke("text")
+      .then((text) => {
+        this.#username = text
+          .toString()
+          .replace(/Username:/g, "")
+          .trim();
+      });
     return this.#username;
   }
 
   #setValidPasswordFromPage() {
-    this.loginElements.passwordListItem().invoke('text').then((text) => {
-        this.#password = text.toString().replace(/Password:/g, '').trim();
-    });
+    this.loginElements
+      .passwordListItem()
+      .invoke("text")
+      .then((text) => {
+        this.#password = text
+          .toString()
+          .replace(/Password:/g, "")
+          .trim();
+      });
     return this.#password;
   }
 
   getUsername(): string {
-    return (this.#username === "") ? this.#setValidUsernameFromPage() : this.#username;
+    return this.#username === ""
+      ? this.#setValidUsernameFromPage()
+      : this.#username;
   }
 
   getPassword() {
-    return (this.#password === "") ? this.#setValidPasswordFromPage() : this.#password;
+    return this.#password === ""
+      ? this.#setValidPasswordFromPage()
+      : this.#password;
   }
 
   visit() {
-    cy.visit('/login');
+    cy.visit("/login");
     this.#setValidUsernameFromPage();
     this.#setValidPasswordFromPage();
   }
@@ -391,24 +413,28 @@ class LoginPage extends BasePage {
   }
 
   verifyPageUrl() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('login_url')}`);
+    cy.url().should(
+      "eq",
+      `${Cypress.config().baseUrl}${Cypress.env("login_url")}`
+    );
   }
 
   verifyPageLoaded() {
     this.verifyPageUrl();
-    this.elements.baseContainer()
+    this.elements
+      .baseContainer()
       .getSelector()
       .then((selector) => {
-        cy.percySnapshot('Login Page', { scope: selector });
+        cy.percySnapshot("Login Page", { scope: selector });
       });
   }
 
   verifyEmptyUsername() {
-    this.elements.username().invoke('val').should('have.lengthOf', 0);
+    this.elements.username().invoke("val").should("have.lengthOf", 0);
   }
 
   verifyEmptyPassword() {
-    this.elements.password().invoke('val').should('have.lengthOf', 0);
+    this.elements.password().invoke("val").should("have.lengthOf", 0);
   }
 }
 
@@ -428,7 +454,7 @@ const verifyLoginPage = () => {
 
 Given("the user is on the Login page", () => {
   loginPage.visit();
-}); 
+});
 
 Given("the login form is displayed", verifyLoginPage);
 
@@ -456,11 +482,14 @@ Then("the user should be redirected to Login page", verifyLoginPage);
 
 Then("the user should remain on the Login page", verifyLoginPage);
 
-Then("an error message {string} should be displayed", function (alertMessage: string) {
+Then(
+  "an error message {string} should be displayed",
+  function (alertMessage: string) {
     const alert = loginPage.getAlert();
-    alert.should('have.css', 'background-color', 'rgb(248, 215, 218)');
+    alert.should("have.css", "background-color", "rgb(248, 215, 218)");
     alert.contains(alertMessage);
-});
+  }
+);
 
 Then("the username field should be cleared", () => {
   loginPage.verifyEmptyUsername();
@@ -474,27 +503,32 @@ Then("the password field should be cleared", () => {
 ## Best Practices
 
 ### 1. Test Organization
+
 - Group related tests in describe blocks
 - Use descriptive test names
 - Keep tests independent and atomic
 - Use beforeEach/afterEach for setup/cleanup
 
 ### 2. Selectors
+
 - Prefer data-testid attributes over class names or IDs
 - Use semantic selectors when possible
 - Avoid brittle selectors that change frequently
 
 ### 3. Assertions
+
 - Use explicit assertions over implicit ones
 - Chain assertions for better readability
 - Use should() for retry-able assertions
 
 ### 4. Test Data
+
 - Use fixtures for static test data
 - Generate dynamic data when needed
 - Clean up test data after tests
 
 ### 5. Performance
+
 - Use cy.session() for authentication
 - Minimize UI interactions in favor of API calls
 - Use cy.intercept() for stubbing API calls
@@ -504,10 +538,12 @@ Then("the password field should be cleared", () => {
 ### Common Issues
 
 1. **TypeScript compilation errors**
+
    - Ensure tsconfig.json is properly configured
    - Check that all dependencies are installed
 
 2. **Element not found errors**
+
    - Add proper waits using cy.wait() or should() assertions
    - Verify selectors are correct
 
@@ -526,10 +562,10 @@ cy.debug();
 cy.pause();
 
 // Log values
-cy.log('Custom message');
+cy.log("Custom message");
 
 // Take screenshot
-cy.screenshot('test-state');
+cy.screenshot("test-state");
 ```
 
 ## Contributing
@@ -565,5 +601,5 @@ jobs:
         with:
           build: npm run build
           start: npm start
-          wait-on: 'http://localhost:3000'
+          wait-on: "http://localhost:3000"
 ```

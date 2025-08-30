@@ -1,17 +1,19 @@
 import { BasePage } from "./BasePage";
 
 class RegistrationPage extends BasePage {
-  
   private readonly registrationSelectors = {
-    confirmPasswordField: '#confirmPassword',
-    registerForm: '#register',
-    submitButton: 'button'
+    confirmPasswordField: "#confirmPassword",
+    registerForm: "#register",
+    submitButton: "button",
   } as const;
 
   protected registrationElements = {
-    confirmPasswordField: () => cy.get(`${this.registrationSelectors.confirmPasswordField}`),
-    submitButton: () => cy.get(`${this.registrationSelectors.registerForm}`)
-      .find(`${this.registrationSelectors.submitButton}`)
+    confirmPasswordField: () =>
+      cy.get(`${this.registrationSelectors.confirmPasswordField}`),
+    submitButton: () =>
+      cy
+        .get(`${this.registrationSelectors.registerForm}`)
+        .find(`${this.registrationSelectors.submitButton}`),
   };
 
   clearUsername() {
@@ -19,9 +21,7 @@ class RegistrationPage extends BasePage {
   }
 
   fillPasswordConfirmation(value: string) {
-    this.registrationElements.confirmPasswordField()
-      .clear()
-      .type(value);
+    this.registrationElements.confirmPasswordField().clear().type(value);
     return this;
   }
 
@@ -30,19 +30,23 @@ class RegistrationPage extends BasePage {
   }
 
   visit() {
-    cy.visit(`${Cypress.env('registration_url')}`);
+    cy.visit(`${Cypress.env("registration_url")}`);
   }
 
   verifyPageUrl() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('registration_url')}`);
+    cy.url().should(
+      "eq",
+      `${Cypress.config().baseUrl}${Cypress.env("registration_url")}`
+    );
   }
 
   verifyPageLoaded() {
     this.verifyPageUrl();
-    this.elements.baseContainer()
+    this.elements
+      .baseContainer()
       .getSelector()
       .then((selector) => {
-        cy.percySnapshot('Registration Page', { scope: selector });
+        cy.percySnapshot("Registration Page", { scope: selector });
       });
   }
 }

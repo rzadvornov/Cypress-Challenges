@@ -1,33 +1,33 @@
 import { Singleton } from "../../../../support/utilities/Decorators";
 import { BasePage } from "../BasePage";
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-const defaultPassword = 'SecurePass123!';
-const EMPTY_CREDENTIALS = { email: '', password: '' };
+const defaultPassword = "SecurePass123!";
+const EMPTY_CREDENTIALS = { email: "", password: "" };
 
 @Singleton
 class SignUpPage extends BasePage {
-  
   private readonly signUpSelectors = {
-    signUpHeader: 'h1',
-    emailInput: '#email',
-    confirmPasswordInput: '#password2',
-    signUpButton: '#submit',
+    signUpHeader: "h1",
+    emailInput: "#email",
+    confirmPasswordInput: "#password2",
+    signUpButton: "#submit",
     signInLink: 'a[href*="/bookstore/user/signin"]',
-    navigationBar: '#navbarDropdown',
-    profileLink: '#profile',
-    logoutLink: '#logout'
+    navigationBar: "#navbarDropdown",
+    profileLink: "#profile",
+    logoutLink: "#logout",
   } as const;
 
   protected signUpElements = {
     signUp: () => cy.get(`${this.signUpSelectors.signUpHeader}`),
     email: () => cy.get(`${this.signUpSelectors.emailInput}`),
-    confirmPassword: () => cy.get(`${this.signUpSelectors.confirmPasswordInput}`),
+    confirmPassword: () =>
+      cy.get(`${this.signUpSelectors.confirmPasswordInput}`),
     signUpButton: () => cy.get(`${this.signUpSelectors.signUpButton}`),
     signInButton: () => cy.get(`${this.signUpSelectors.signInLink}`),
     navigationBar: () => cy.get(`${this.signUpSelectors.navigationBar}`),
     profile: () => cy.get(`${this.signUpSelectors.profileLink}`),
-    logout: () => cy.get(`${this.signUpSelectors.logoutLink}`)
+    logout: () => cy.get(`${this.signUpSelectors.logoutLink}`),
   };
 
   #username: string;
@@ -54,15 +54,13 @@ class SignUpPage extends BasePage {
   }
 
   fillEmail(email: string) {
-    this.#email = email === '[random]' ? faker.internet.email() : email;
-    this.signUpElements.email()
-      .clear()
-      .type(this.#email);
+    this.#email = email === "[random]" ? faker.internet.email() : email;
+    this.signUpElements.email().clear().type(this.#email);
     return this;
   }
 
   fillUsername(value: string) {
-    this.#username = value === '[random]' ? faker.internet.username() : value;
+    this.#username = value === "[random]" ? faker.internet.username() : value;
     super.fillUsername(this.#username);
     return this;
   }
@@ -74,9 +72,7 @@ class SignUpPage extends BasePage {
   }
 
   fillPasswordConfirmation(password: string) {
-    this.signUpElements.confirmPassword()
-      .clear()
-      .type(password);
+    this.signUpElements.confirmPassword().clear().type(password);
     return this;
   }
 
@@ -89,20 +85,22 @@ class SignUpPage extends BasePage {
   }
 
   #hasEmptyCredentials() {
-  return this.#email === EMPTY_CREDENTIALS.email && 
-         this.#password === EMPTY_CREDENTIALS.password;
+    return (
+      this.#email === EMPTY_CREDENTIALS.email &&
+      this.#password === EMPTY_CREDENTIALS.password
+    );
   }
 
   #registerNewUser() {
     const steps = [
       () => this.visit(),
-      () => this.fillUsername('[random]'),
-      () => this.fillEmail('[random]'),
+      () => this.fillUsername("[random]"),
+      () => this.fillEmail("[random]"),
       () => this.fillPassword(defaultPassword),
       () => this.fillPasswordConfirmation(defaultPassword),
-      () => this.submit()
+      () => this.submit(),
     ];
-  
+
     for (const step of steps) {
       step();
     }
@@ -115,29 +113,32 @@ class SignUpPage extends BasePage {
   }
 
   visit() {
-    cy.visit(`${Cypress.env('bookstore_url')}${Cypress.env('signUp_url')}`);
+    cy.visit(`${Cypress.env("bookstore_url")}${Cypress.env("signUp_url")}`);
   }
 
   verifyPageUrl() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}${Cypress.env('signUp_url')}`);
+    cy.url().should(
+      "eq",
+      `${Cypress.config().baseUrl}${Cypress.env("bookstore_url")}${Cypress.env(
+        "signUp_url"
+      )}`
+    );
   }
 
   verifyPageLoaded(): void {
     this.verifyPageUrl();
-    this.elements.baseContainer()
+    this.elements
+      .baseContainer()
       .getSelector()
       .then((selector) => {
-        cy.percySnapshot('SignUp Page', { scope: selector });
+        cy.percySnapshot("SignUp Page", { scope: selector });
       });
-    this.signUpElements.signUp()
-      .should('be.visible')
-      .contains('Sign up');
-    this.signUpElements.signUpButton()
-      .should('be.visible')
-      .contains('Sign Up');
-    this.signUpElements.signInButton()
-      .should('be.visible')
-      .contains('Sign in!');
+    this.signUpElements.signUp().should("be.visible").contains("Sign up");
+    this.signUpElements.signUpButton().should("be.visible").contains("Sign Up");
+    this.signUpElements
+      .signInButton()
+      .should("be.visible")
+      .contains("Sign in!");
   }
 }
 

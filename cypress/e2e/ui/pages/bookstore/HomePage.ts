@@ -1,19 +1,19 @@
 import { BasePage } from "../BasePage";
 
 class HomePage extends BasePage {
-  
   private readonly homeSelectors = {
     logoLink: 'a[href*="bookstore"]',
-    booksContainer: '#books',
-    bookCards: '#books .card-product-user',
-    searchInput: '#search-input',
-    searchButton: '[data-testid="search-btn"], .search-button, button[type="submit"]',
-    categoryFilter: '.filter_sort',
+    booksContainer: "#books",
+    bookCards: "#books .card-product-user",
+    searchInput: "#search-input",
+    searchButton:
+      '[data-testid="search-btn"], .search-button, button[type="submit"]',
+    categoryFilter: ".filter_sort",
     cartLink: 'a[href*="bookstore/cart"]',
     addToCartLink: 'a[href*="bookstore/add-to-cart/"]',
-    cartBadge: '.badge',
+    cartBadge: ".badge",
     signInButton: '[data-testid="goto-signin"]',
-    paginationContainer: '#pagination'
+    paginationContainer: "#pagination",
   } as const;
 
   protected homeElements = {
@@ -26,13 +26,12 @@ class HomePage extends BasePage {
     cartIcon: () => cy.get(`${this.homeSelectors.cartLink}`),
     cartItems: () => cy.get(`${this.homeSelectors.cartBadge}`),
     signInButton: () => cy.get(`${this.homeSelectors.signInButton}`),
-    paginationContainer: () => cy.get(`${this.homeSelectors.paginationContainer}`)
+    paginationContainer: () =>
+      cy.get(`${this.homeSelectors.paginationContainer}`),
   };
 
   enterSearchTerm(searchTerm: string) {
-    this.homeElements.searchField()
-      .clear()
-      .type(searchTerm);
+    this.homeElements.searchField().clear().type(searchTerm);
   }
 
   selectCart() {
@@ -47,52 +46,70 @@ class HomePage extends BasePage {
     this.findAddCartButtonForBook(bookTitle).click({ force: true });
   }
 
-  private findAddCartButtonForBook(bookTitle: string): Cypress.Chainable<JQuery<HTMLElement>> {
-    return cy.contains('[data-testid^="title-"]', bookTitle)
-      .invoke('attr', 'data-testid')
+  private findAddCartButtonForBook(
+    bookTitle: string
+  ): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy
+      .contains('[data-testid^="title-"]', bookTitle)
+      .invoke("attr", "data-testid")
       .then((titleTestId) => {
-        const cartTestId = (titleTestId as string).replace('title', 'cart');
+        const cartTestId = (titleTestId as string).replace("title", "cart");
         return cy.get(`[data-testid="${cartTestId}"]`);
-     });
+      });
   }
 
   selectBook(bookTitle: string): void {
     this.findBookAndNavigate(bookTitle, ($titleElement) => {
-     const dataTestId = $titleElement.attr('data-testid');
-     return cy.get(`[data-testid="${dataTestId}"]`).parent().invoke('attr', 'href');
+      const dataTestId = $titleElement.attr("data-testid");
+      return cy
+        .get(`[data-testid="${dataTestId}"]`)
+        .parent()
+        .invoke("attr", "href");
     });
   }
 
-  private findBookAndNavigate(bookTitle: string, getHrefCallback: (titleElement: JQuery<HTMLElement>) => Cypress.Chainable<string | undefined>): void {
+  private findBookAndNavigate(
+    bookTitle: string,
+    getHrefCallback: (
+      titleElement: JQuery<HTMLElement>
+    ) => Cypress.Chainable<string | undefined>
+  ): void {
     let foundHref: string | null = null;
-    this.homeElements.bookItems().each(($book) => {
-      cy.wrap($book).within(() => {
-        cy.get('[data-testid^="title-"]').should('exist').then(($titleElement) => {
-          const titleElementText = $titleElement.text();
-          if (titleElementText.includes(bookTitle)) {
-            getHrefCallback($titleElement).then((href: string | undefined) => {
-              foundHref = href || `${Cypress.env('bookstore_url')}`;
+    this.homeElements
+      .bookItems()
+      .each(($book) => {
+        cy.wrap($book).within(() => {
+          cy.get('[data-testid^="title-"]')
+            .should("exist")
+            .then(($titleElement) => {
+              const titleElementText = $titleElement.text();
+              if (titleElementText.includes(bookTitle)) {
+                getHrefCallback($titleElement).then(
+                  (href: string | undefined) => {
+                    foundHref = href || `${Cypress.env("bookstore_url")}`;
+                  }
+                );
+              }
             });
-          }
-       });
-     });
-    }).then(() => {
-      if (foundHref) {
-       cy.visit(foundHref);
-     }
-    });
+        });
+      })
+      .then(() => {
+        if (foundHref) {
+          cy.visit(foundHref);
+        }
+      });
   }
 
   selectCategory(categoryId: string) {
     cy.get(`[data-testid="category-${categoryId}"]`)
-      .invoke('attr', 'href')
+      .invoke("attr", "href")
       .then((href) => {
-        cy.visit(href || `${Cypress.env('bookstore_url')}`);
+        cy.visit(href || `${Cypress.env("bookstore_url")}`);
       });
   }
 
   setResolution(resolution: string) {
-    const [width, height] = resolution.split('x').map(Number);
+    const [width, height] = resolution.split("x").map(Number);
     cy.viewport(width, height);
   }
 
@@ -101,94 +118,95 @@ class HomePage extends BasePage {
   }
 
   visit() {
-    cy.visit(`${Cypress.env('bookstore_url')}`);
+    cy.visit(`${Cypress.env("bookstore_url")}`);
   }
 
   verifyPageUrl() {
-    cy.url().should('eq', `${Cypress.config().baseUrl}${Cypress.env('bookstore_url')}`);
+    cy.url().should(
+      "eq",
+      `${Cypress.config().baseUrl}${Cypress.env("bookstore_url")}`
+    );
   }
 
   verifyPageLoaded(): void {
     this.verifyPageUrl();
-    this.elements.baseContainer()
+    this.elements
+      .baseContainer()
       .getSelector()
       .then((selector) => {
-        cy.percySnapshot('Book Store Home Page', { scope: selector });
+        cy.percySnapshot("Book Store Home Page", { scope: selector });
       });
-    this.homeElements.searchButton()
-      .should('be.visible')
-      .contains('Search');
+    this.homeElements.searchButton().should("be.visible").contains("Search");
     this.verifyNavigationElements();
     this.verifyBookstoreLogo();
-    this.homeElements.logo()
-      .should('be.visible')
-      .contains('All Books');
+    this.homeElements.logo().should("be.visible").contains("All Books");
   }
 
   verifyNavigationElements() {
-    this.homeElements.signInButton()
-      .should('be.visible')
-      .contains("Sign In");
+    this.homeElements.signInButton().should("be.visible").contains("Sign In");
   }
 
   verifySearchExecuted() {
-    cy.url().should('include', 'search');
-    this.homeElements.bookItems()
-      .should('have.length.greaterThan', 0);
+    cy.url().should("include", "search");
+    this.homeElements.bookItems().should("have.length.greaterThan", 0);
   }
 
   verifySearchResult(searchTerm: string) {
     this.homeElements.bookItems().each(($book) => {
       cy.wrap($book).within(() => {
-        cy.get('[data-testid^="title-"]').should('exist').contains(searchTerm);
+        cy.get('[data-testid^="title-"]').should("exist").contains(searchTerm);
       });
-    }); 
+    });
   }
 
   verifyEachBookHasAttributes() {
-    const currencies = ['€', '$', '£'];
+    const currencies = ["€", "$", "£"];
     this.homeElements.bookItems().each(($book) => {
-    cy.wrap($book).within(() => {
+      cy.wrap($book).within(() => {
         // Find any element with data-testid starting with "title-" to get the book ID
-        cy.get('[data-testid^="title-"]').should('exist').then(($titleElement) => {
-            const dataTestId = $titleElement.attr('data-testid');   
+        cy.get('[data-testid^="title-"]')
+          .should("exist")
+          .then(($titleElement) => {
+            const dataTestId = $titleElement.attr("data-testid");
             if (dataTestId) {
-              const bookId = dataTestId.replace('title-', '');
-                
-                // Now verify all elements for this specific book
+              const bookId = dataTestId.replace("title-", "");
+
+              // Now verify all elements for this specific book
               cy.get(`[data-testid="title-${bookId}"]`)
-                .should('exist')
-                .and('be.visible')
-                .invoke('text')
-                .should('have.length.gt', 0);
+                .should("exist")
+                .and("be.visible")
+                .invoke("text")
+                .should("have.length.gt", 0);
               cy.get(`[data-testid="price-${bookId}"]`)
-                .should('exist')
-                .invoke('text')
+                .should("exist")
+                .invoke("text")
                 .then((priceText) => {
-                  const text = priceText.replace(/[0-9\s]/g, '');
+                  const text = priceText.replace(/[0-9\s]/g, "");
                   expect(text).to.be.oneOf(currencies);
-                }); 
-            
+                });
+
               cy.get(`[data-testid="cart-${bookId}"]`)
-                .should('exist')
-                .contains('Add To Cart');
+                .should("exist")
+                .contains("Add To Cart");
             } else {
-                throw new Error('data-testid attribute not found on title element');
+              throw new Error(
+                "data-testid attribute not found on title element"
+              );
             }
-         });
+          });
       });
     });
   }
 
   verifyAvailableBooks() {
-    this.homeElements.bookContainer().children()
-      .should('have.length.greaterThan', 0);
+    this.homeElements
+      .bookContainer()
+      .children()
+      .should("have.length.greaterThan", 0);
   }
-  
+
   verifyBookstoreLogo() {
-    this.homeElements.logo()
-      .should('be.visible')
-      .contains('All Books');
+    this.homeElements.logo().should("be.visible").contains("All Books");
   }
 
   verifyCartCounter(quantity: string) {
