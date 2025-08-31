@@ -1,4 +1,6 @@
-import { Note, NoteCreate, NoteUpdate } from "./note";
+import { Note } from "./types/note";
+import { NoteCreate } from "./types/noteCreate";
+import { NoteUpdate } from "./types/noteUpdate";
 import { BaseAPI } from "../BaseAPI";
 import { HTTPMethod } from "http-method-enum";
 import { StatusCode } from "status-code-enum";
@@ -260,10 +262,8 @@ export class NotesAPI extends BaseAPI {
     response: Cypress.Response<{ data: Note[] }> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ): void {
-    const actualResponse = (response as any).jquery
-      ? (response as any)[0]
-      : response;
-    this.validateResponse(actualResponse, expectedStatus);
+    const actualResponse = this.normalizeResponse(response);
+    this.validateStandardResponse(actualResponse, expectedStatus);
 
     if (expectedStatus === StatusCode.SuccessOK) {
       expect(actualResponse.body.data).to.be.an("array");
@@ -282,13 +282,13 @@ export class NotesAPI extends BaseAPI {
     response: Cypress.Response<{ data: Note }> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ): void {
-    const actualResponse = (response as any).jquery
-      ? (response as any)[0]
-      : response;
-    this.validateResponse(actualResponse, expectedStatus);
+    const actualResponse = this.normalizeResponse(response);
+    this.validateStandardResponse(actualResponse, expectedStatus);
 
     if (expectedStatus === StatusCode.SuccessOK) {
       this.validateNoteStructure(actualResponse.body.data);
     }
   }
 }
+
+export const notesAPI = new NotesAPI();

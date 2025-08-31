@@ -1,18 +1,13 @@
-import { UserCreate } from "./user";
-import { AuthAPI } from "../auth/AuthAPI";
-import { NotesAPI } from "../note/NotesAPI";
-import { Note, NoteCreate } from "../note/note";
 import { StatusCode } from "status-code-enum";
-
-interface CreatedUser {
-  token: string;
-  userData: UserCreate;
-}
-
-interface CreatedNote {
-  id: string;
-  token: string;
-}
+import { AuthAPI } from "../notes/AuthAPI";
+import { NotesAPI } from "../notes/NotesAPI";
+import { Note } from "../notes/types/note";
+import { NoteCreate } from "../notes/types/noteCreate";
+import { PlaceholderReplacer } from "./data/PlaceholderReplacer";
+import { CreatedNote } from "./types/createdNote";
+import { CreatedUser } from "./types/createdUser";
+import { UserCreate } from "./types/userCreate";
+import { TestDataProvider } from "./data/TestDataProvider";
 
 export class TestDataAPI {
   private static instance: TestDataAPI;
@@ -20,12 +15,16 @@ export class TestDataAPI {
   private notesAPI: NotesAPI;
   private createdUsers: CreatedUser[];
   private createdNotes: CreatedNote[];
+  private dataProvider: TestDataProvider;
+  private placeholderReplacer: PlaceholderReplacer;
 
   constructor() {
     this.authAPI = new AuthAPI();
     this.notesAPI = new NotesAPI();
     this.createdUsers = [];
     this.createdNotes = [];
+    this.placeholderReplacer = new PlaceholderReplacer();
+    this.dataProvider = new TestDataProvider(this.placeholderReplacer);
   }
 
   public static getInstance(): TestDataAPI {
@@ -39,52 +38,40 @@ export class TestDataAPI {
     return this.createdUsers[index];
   }
 
-  /**
-   * Generates unique test user data.
-   * @param suffix - Optional suffix for uniqueness.
-   * @returns A UserCreate object.
-   */
+  // Delegate methods to data provider
   public generateUser(suffix = ""): UserCreate {
-    const timestamp = Date.now();
-    return {
-      name: `TestUser${timestamp}${suffix}`,
-      email: `testuser${timestamp}${suffix}@example.com`,
-      password: "SecurePass123!",
-    };
+    return this.dataProvider.generateUser(suffix);
+  }
+
+  public generateNote(overrides: Partial<NoteCreate> = {}): NoteCreate {
+    return this.dataProvider.generateNote(overrides);
+  }
+
+  public get data() {
+    return this.dataProvider.getProgrammaticInvalidData();
+  }
+
+  public getInvalidData() {
+    return this.dataProvider.getInvalidDataFromFixtures();
+  }
+
+  public getValidData() {
+    return this.dataProvider.getValidDataFromFixtures();
   }
 
   /**
-   * Generates test note data.
-   * @param overrides - Properties to override the default note.
-   * @returns A NoteCreate object.
+   * Gets a specific note from fixtures
+   * @param noteType - The type of note to get
    */
-  public generateNote(overrides: Partial<NoteCreate> = {}): NoteCreate {
-    const timestamp = Date.now();
-    const defaultNote: NoteCreate = {
-      title: `Test Note ${timestamp}`,
-      description: `This is a test note created at ${new Date().toISOString()}`,
-      completed: false,
-    };
-    return { ...defaultNote, ...overrides };
+  public getNoteFromFixture(noteType: string): NoteCreate {
+    return this.dataProvider.getNoteFromFixture(noteType);
   }
 
-  // All static test data is now centralized here
-  public get data() {
-    return {
-      invalid: {
-        user: {
-          invalidEmail: this.generateUser().email.replace("@", ""),
-          emptyName: { ...this.generateUser(), name: "" },
-          shortPassword: { ...this.generateUser(), password: "123" },
-        },
-        note: {
-          emptyTitle: this.generateNote({ title: "" }),
-          nullTitle: this.generateNote({ title: null as any }),
-          longTitle: this.generateNote({ title: "A".repeat(1000) }),
-          wrongTypes: { title: 123, description: true, completed: "yes" },
-        },
-      },
-    };
+  /**
+   * Gets all notes from fixtures
+   */
+  public getAllNotesFromFixtures(): Record<string, NoteCreate> {
+    return this.dataProvider.getAllNotesFromFixtures();
   }
 
   /**
@@ -201,82 +188,6 @@ export class TestDataAPI {
           pending: createdNotes.filter((note) => !note.completed),
         };
       });
-  }
-
-  /**
-   * Provides a structured collection of invalid data scenarios for negative testing.
-   * @returns {Object} A comprehensive object containing various invalid data sets.
-   */
-  getInvalidData() {
-    return {
-      // Scenarios for user-related endpoints
-      user: {
-        invalidEmail: {
-          name: "Test User",
-          email: "invalid-email-format",
-          password: "SecurePass123!",
-        },
-        invalidCredentials: {
-          name: "Non Existent User",
-          email: 'nonexistent@example.com',
-          password: 'wrongpassword'
-        },
-        emptyName: {
-          name: "",
-          email: "test@example.com",
-          password: "SecurePass123!",
-        },
-        missingFields: {
-          // Missing 'name' and 'password' fields
-          email: "test@example.com",
-        },
-        shortPassword: {
-          name: "Test User",
-          email: "test@example.com",
-          password: "123",
-        },
-        longPassword: {
-          name: "Test User",
-          email: "test@example.com",
-          password: "A".repeat(129), // Example: a password exceeding a common length limit
-        },
-      },
-
-      // Scenarios for note-related endpoints
-      note: {
-        nullTitle: {
-          title: null,
-          description: "Note with a null title",
-        },
-        emptyTitle: {
-          title: "",
-          description: "Note with an empty title",
-        },
-        longTitle: {
-          title: "A".repeat(1001), // Assuming a max title length of 1000
-          description: "Note with an excessively long title",
-        },
-        unsupportedDataTypes: {
-          title: 12345, // Number instead of string
-          description: true, // Boolean instead of string
-          completed: "yes", // String instead of boolean
-        },
-        // Example of an array instead of a string
-        titleAsArray: {
-          title: ["title array"],
-          description: "Note with title as an array",
-        },
-      },
-
-      // Scenarios for API-level or format-related issues
-      api: {
-        malformedJson: '{"title": "Test", "description":}', // JSON syntax error
-        extremelyLargePayload: {
-          title: "Large Payload Test",
-          description: "A".repeat(100001), // Assuming a payload size limit
-        },
-      },
-    };
   }
 
   /**

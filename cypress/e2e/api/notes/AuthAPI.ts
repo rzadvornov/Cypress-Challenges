@@ -1,7 +1,7 @@
 import { BaseAPI } from "../BaseAPI";
 import { HTTPMethod } from "http-method-enum";
 import { StatusCode } from "status-code-enum";
-import { User } from "../support/user";
+import { User } from "../support/types/user";
 
 export class AuthAPI extends BaseAPI {
   /**
@@ -13,7 +13,7 @@ export class AuthAPI extends BaseAPI {
     return this.request({
       method: HTTPMethod.POST,
       url: `${Cypress.env("register_user_url")}`,
-      body: userData
+      body: userData,
     });
   }
 
@@ -92,11 +92,11 @@ export class AuthAPI extends BaseAPI {
   registerAndLogin(userData: { email: string; password: string }) {
     return this.register(userData).then(() => {
       return this.login({
-          email: userData.email,
-          password: userData.password,
-        }).then((loginResponse) => {
-          return loginResponse.body.data.token;
-        });
+        email: userData.email,
+        password: userData.password,
+      }).then((loginResponse) => {
+        return loginResponse.body.data.token;
+      });
     });
   }
 
@@ -139,10 +139,8 @@ export class AuthAPI extends BaseAPI {
     response: Cypress.Response<any> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ) {
-    const actualResponse = (response as any).jquery
-      ? (response as any)[0]
-      : response;
-    this.validateResponse(actualResponse, expectedStatus);
+    const actualResponse = this.normalizeResponse(response);
+    this.validateStandardResponse(actualResponse, expectedStatus);
 
     if (
       expectedStatus === StatusCode.SuccessOK ||
@@ -164,10 +162,8 @@ export class AuthAPI extends BaseAPI {
     response: Cypress.Response<any> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ) {
-    const actualResponse = (response as any).jquery
-      ? (response as any)[0]
-      : response;
-    this.validateResponse(actualResponse, expectedStatus);
+    const actualResponse = this.normalizeResponse(response);
+    this.validateStandardResponse(actualResponse, expectedStatus);
 
     if (
       expectedStatus === StatusCode.SuccessOK ||

@@ -1,0 +1,14 @@
+{
+  "validNote": {
+    "title": "Test Note TIMESTAMP_PLACEHOLDER",
+    "description": "This is a test note for automated testing",
+    "category": "Work"
+  },
+  "titleOnlyNote": {
+    "title": "Test Note TIMESTAMP_PLACEHOLDER"
+  },
+  "incompleteNote": {
+    "description": "Note without title",
+    "category": "Work"
+  }
+}

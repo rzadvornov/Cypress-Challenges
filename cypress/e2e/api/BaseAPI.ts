@@ -1,12 +1,11 @@
-import { HTTPMethod } from 'http-method-enum';
-import { StatusCode } from 'status-code-enum';
+import { HTTPMethod } from "http-method-enum";
+import { StatusCode } from "status-code-enum";
 
 export class BaseAPI {
-  
   baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${Cypress.config().baseUrl}${Cypress.env('apiBaseUrl')}`;
+    this.baseUrl = `${Cypress.config().baseUrl}${Cypress.env("apiBaseUrl")}`;
   }
 
   /**
@@ -26,23 +25,28 @@ export class BaseAPI {
     const defaultOptions = {
       method: HTTPMethod.GET,
       failOnStatusCode: false,
-      timeout: Cypress.env('defaultTimeout') || 10000,
+      timeout: Cypress.env("defaultTimeout") || 10000,
       headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
     };
 
     const requestOptions = {
       ...defaultOptions,
       ...options,
-      url: `${this.baseUrl}${options.url}`
+      url: `${this.baseUrl}${options.url}`,
     };
 
     return cy.request(requestOptions).then((response) => {
-      if (response.status >= StatusCode.ClientErrorBadRequest && requestOptions.failOnStatusCode === true) {
+      if (
+        response.status >= StatusCode.ClientErrorBadRequest &&
+        requestOptions.failOnStatusCode === true
+      ) {
         cy.log(`API request failed with status: ${response.status}`);
-        throw new Error(`API request to ${requestOptions.url} failed with status code ${response.status}`);
+        throw new Error(
+          `API request to ${requestOptions.url} failed with status code ${response.status}`
+        );
       }
       return response;
     });
@@ -55,8 +59,36 @@ export class BaseAPI {
    */
   getAuthHeaders(token: string): Record<string, string> {
     return {
-      'X-Auth-Token': token
+      "X-Auth-Token": token,
     };
+  }
+
+  /**
+   * Normalizes a response that could be either a Cypress Response or a jQuery element
+   * @param response - The response to normalize, either Cypress.Response or JQuery<HTMLElement>
+   * @returns The actual response object, extracting from jQuery wrapper if necessary
+   */
+  public normalizeResponse(
+    response: Cypress.Response<any> | JQuery<HTMLElement>
+  ): Cypress.Response<any> {
+    const actualResponse = (response as any).jquery
+      ? (response as any)[0]
+      : response;
+
+    return actualResponse;
+  }
+
+  /**
+   * Validate standard API response status code
+   * @param {Object} response - API response
+   * @param {number} expectedStatus - Expected HTTP status
+   */
+  validateResponseStatusCode(
+    response: Cypress.Response<any> | JQuery<HTMLElement>,
+    expectedStatus: number
+  ): void {
+    const actualResponse = this.normalizeResponse(response);
+    expect(actualResponse.status).to.equal(expectedStatus);
   }
 
   /**
@@ -64,20 +96,26 @@ export class BaseAPI {
    * @param {Object} response - API response
    * @param {number} expectedStatus - Expected HTTP status
    */
-  validateResponse(response: Cypress.Response<any> | JQuery<HTMLElement>, expectedStatus = StatusCode.SuccessOK): void {
-    const actualResponse = (response as any).jquery ? (response as any)[0] : response;
-    expect(actualResponse).to.have.property('status', expectedStatus);
-    expect(actualResponse).to.have.property('body');
-    expect(actualResponse.body).to.have.property('success');
-    
-    if (expectedStatus >= StatusCode.SuccessOK && expectedStatus < StatusCode.RedirectMultipleChoices) {
+  validateStandardResponse(
+    response: Cypress.Response<any> | JQuery<HTMLElement>,
+    expectedStatus = StatusCode.SuccessOK
+  ): void {
+    const actualResponse = this.normalizeResponse(response);
+    expect(actualResponse).to.have.property("status", expectedStatus);
+    expect(actualResponse).to.have.property("body");
+    expect(actualResponse.body).to.have.property("success");
+
+    if (
+      expectedStatus >= StatusCode.SuccessOK &&
+      expectedStatus < StatusCode.RedirectMultipleChoices
+    ) {
       expect(actualResponse.body.success).to.be.true;
       if (actualResponse.body.data) {
-        expect(actualResponse.body).to.have.property('data');
+        expect(actualResponse.body).to.have.property("data");
       }
     } else {
       expect(actualResponse.body.success).to.be.false;
-      expect(actualResponse.body).to.have.property('message');
+      expect(actualResponse.body).to.have.property("message");
     }
   }
 
@@ -88,13 +126,12 @@ export class BaseAPI {
   waitForAPIReady(): Cypress.Chainable {
     return this.request({
       method: HTTPMethod.GET,
-      url: Cypress.env('health_check_url'),
-      failOnStatusCode: false
+      url: Cypress.env("health_check_url"),
+      failOnStatusCode: false,
     }).then((response) => {
-      
       if (response.status !== StatusCode.SuccessOK) {
-        cy.log('API health check failed, but continuing...');
-      } 
+        cy.log("API health check failed, but continuing...");
+      }
       return response;
     });
   }

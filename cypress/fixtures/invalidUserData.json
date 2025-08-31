@@ -1,0 +1,30 @@
+{
+  "invalidEmail": {
+    "name": "Test User",
+    "email": "invalid-email-format",
+    "password": "SecurePass123!"
+  },
+  "invalidCredentials": {
+    "name": "Non Existent User",
+    "email": "nonexistent@example.com",
+    "password": "wrongpassword"
+  },
+  "emptyName": {
+    "name": "",
+    "email": "test@example.com",
+    "password": "SecurePass123!"
+  },
+  "missingFields": {
+    "email": "test@example.com"
+  },
+  "shortPassword": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "123"
+  },
+  "longPassword": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "LONG_PASSWORD_PLACEHOLDER" 
+  }
+}

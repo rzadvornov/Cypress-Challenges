@@ -1,0 +1,23 @@
+{
+  "nullTitle": {
+    "title": null,
+    "description": "Note with a null title"
+  },
+  "emptyTitle": {
+    "title": "",
+    "description": "Note with an empty title"
+  },
+  "longTitle": {
+    "title": "LONG_TITLE_PLACEHOLDER",
+    "description": "Note with an excessively long title"
+  },
+  "unsupportedDataTypes": {
+    "title": 12345,
+    "description": true,
+    "completed": "yes"
+  },
+  "titleAsArray": {
+    "title": ["title array"],
+    "description": "Note with title as an array"
+  }
+}
