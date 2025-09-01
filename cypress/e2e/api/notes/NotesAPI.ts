@@ -4,6 +4,7 @@ import { NoteUpdate } from "./types/noteUpdate";
 import { BaseAPI } from "../BaseAPI";
 import { HTTPMethod } from "http-method-enum";
 import { StatusCode } from "status-code-enum";
+import { ApiResponse } from "./types/apiResponse";
 
 export class NotesAPI extends BaseAPI {
   /**
@@ -15,7 +16,7 @@ export class NotesAPI extends BaseAPI {
   create(
     token: string,
     noteData: NoteCreate
-  ): Cypress.Chainable<Cypress.Response<Note>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>> {
     return this.request({
       method: HTTPMethod.POST,
       url: `${Cypress.env("notes_url")}`,
@@ -191,16 +192,21 @@ export class NotesAPI extends BaseAPI {
    * Create multiple notes
    * @param {string} token - Auth token
    * @param {NoteCreate[]} notesArray - Array of note data objects
-   * @returns {Promise<Cypress.Response<Note>[]>} - Array of create responses
+   * @returns {Cypress.Chainable<Cypress.Response<Note>[]>} - Array of create responses
    */
-  createMultiple(
+  public createMultiple(
     token: string,
     notesArray: NoteCreate[]
-  ): Promise<Cypress.Response<Note>[]> {
-    const createPromises = notesArray.map((note) =>
-      this.create(token, note).then((response) => response.body.data)
-    );
-    return Promise.all(createPromises);
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>[]> {
+    const responses: Cypress.Response<ApiResponse<Note>>[] = [];
+
+    notesArray.forEach((note) => {
+      this.create(token, note).then((resp) => {
+        responses.push(resp);
+      });
+    });
+
+    return cy.wrap(null).then(() => responses);
   }
 
   /**

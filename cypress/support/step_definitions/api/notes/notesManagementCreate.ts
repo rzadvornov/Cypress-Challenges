@@ -99,11 +99,33 @@ Then("the note description should be empty or null", () => {
   });
 });
 
-Then("the error should specify missing required fields", () => {
+Then("the error should specify missing title field", () => {
   cy.get("@apiResponse").then((response) => {
     const actualResponse = notesAPI.normalizeResponse(response);
     expect(actualResponse.body).to.have.property("message");
-    expect(actualResponse.body.message).to.match(/required|missing|invalid/i);
+    expect(actualResponse.body.message).to.be.eq(
+      "Title must be between 4 and 100 characters"
+    );
+  });
+});
+
+Then("the user should receive a validation error", () => {
+  cy.get("@apiResponse").then((response) => {
+    const actualResponse = notesAPI.normalizeResponse(response);
+    expect(actualResponse.status).to.be.oneOf([
+      StatusCode.ClientErrorBadRequest,
+      StatusCode.ClientErrorUnprocessableEntity,
+    ]);
+  });
+});
+
+Then("the error should specify missing description field", () => {
+  cy.get("@apiResponse").then((response) => {
+    const actualResponse = notesAPI.normalizeResponse(response);
+    expect(actualResponse.body).to.have.property("message");
+    expect(actualResponse.body.message).to.be.eq(
+      "Description must be between 4 and 1000 characters"
+    );
   });
 });
 

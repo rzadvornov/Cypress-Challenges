@@ -8,6 +8,7 @@ import { CreatedNote } from "./types/createdNote";
 import { CreatedUser } from "./types/createdUser";
 import { UserCreate } from "./types/userCreate";
 import { TestDataProvider } from "./data/TestDataProvider";
+import { ApiResponse } from "../notes/types/apiResponse";
 
 export class TestDataAPI {
   private static instance: TestDataAPI;
@@ -113,16 +114,19 @@ export class TestDataAPI {
     token: string,
     noteData: NoteCreate = this.generateNote()
   ): Cypress.Chainable<Note> {
-    return this.notesAPI.create(token, noteData).then((response) => {
-      if (response.status === StatusCode.SuccessOK) {
-        const noteId = response.body.data.id;
-        this.createdNotes.push({ id: noteId, token: token });
-        return response.body.data;
-      }
-      return cy.log("Note creation failed").then(() => {
+    return this.notesAPI
+      .create(token, noteData)
+      .then((response: Cypress.Response<ApiResponse<Note>>) => {
+        if (response.status === StatusCode.SuccessOK) {
+          const note = response.body.data;
+          this.createdNotes.push({ id: note.id, token });
+          return note;
+        }
+
+        // Fail gracefully
+        cy.log("Note creation failed");
         throw new Error("Note creation failed");
       });
-    });
   }
 
   /**
@@ -137,24 +141,21 @@ export class TestDataAPI {
   ): Cypress.Chainable<Note[]> {
     const notes = Array.from({ length: count }, () => this.generateNote());
 
-    return cy
-      .then((): Promise<Cypress.Response<Note>[]> => {
-        return this.notesAPI.createMultiple(token, notes);
-      })
-      .then((responses: Cypress.Response<Note>[]): Note[] => {
-        const createdNotes = responses
-          .filter((response) => response.status === StatusCode.SuccessOK)
-          .map((response) => {
-            this.createdNotes.push({ id: response.body.data.id, token });
-            return response.body.data;
-          });
+    return this.notesAPI.createMultiple(token, notes).then((responses) => {
+      const createdNotes = responses
+        .filter((response) => response.status === StatusCode.SuccessOK)
+        .map((response) => {
+          const note = response.body.data;
+          this.createdNotes.push({ id: note.id, token });
+          return note;
+        });
 
-        if (createdNotes.length === 0) {
-          throw new Error("No notes were created successfully");
-        }
+      if (createdNotes.length === 0) {
+        throw new Error("No notes were created successfully");
+      }
 
-        return createdNotes;
-      });
+      return createdNotes;
+    });
   }
 
   /**
@@ -175,13 +176,13 @@ export class TestDataAPI {
     return cy
       .wrap(this.notesAPI.createMultiple(token, notes))
       .then((responses) => {
-        const createdNotes = (responses as Cypress.Response<Note>[]).map(
-          (response) => {
-            const note = response.body.data;
-            this.createdNotes.push({ id: note.id, token });
-            return note;
-          }
-        );
+        const createdNotes = (
+          responses as unknown as Cypress.Response<Note>[]
+        ).map((response) => {
+          const note = response.body.data;
+          this.createdNotes.push({ id: note.id, token });
+          return note;
+        });
 
         return {
           completed: createdNotes.filter((note) => note.completed),
@@ -194,23 +195,28 @@ export class TestDataAPI {
    * Cleans up all test data (notes and users) created by this instance.
    * @returns A Cypress chainable that resolves after cleanup is complete.
    */
-  cleanup() {
-    // Clean up notes first
-    const noteCleanupPromises = this.createdNotes.map(({ id, token }) =>
-      this.notesAPI.delete(token, id).then(() => cy.wrap(null))
-    );
-
-    return cy.wrap(Promise.all(noteCleanupPromises)).then(() => {
-      // Clean up users (if delete endpoint is available)
-      const userCleanupPromises = this.createdUsers.map(({ token }) =>
-        this.authAPI.deleteAccount(token).then(() => cy.wrap(null))
-      );
-
-      return cy.wrap(Promise.all(userCleanupPromises)).then(() => {
-        this.createdNotes = [];
-        this.createdUsers = [];
-        cy.log("Test data cleanup completed");
+  public cleanup() {
+    // Clean up notes
+    if (this.createdNotes.length > 0) {
+      cy.log(`Cleaning up ${this.createdNotes.length} notes...`);
+      this.createdNotes.forEach(({ id, token }) => {
+        this.notesAPI.delete(token, id);
       });
+    }
+
+    // Clean up users
+    if (this.createdUsers.length > 0) {
+      cy.log(`Cleaning up ${this.createdUsers.length} users...`);
+      this.createdUsers.forEach(({ token }) => {
+        this.authAPI.deleteAccount(token);
+      });
+    }
+
+    // Reset state after Cypress has run all delete commands
+    cy.then(() => {
+      this.createdNotes = [];
+      this.createdUsers = [];
+      cy.log("Test data cleanup completed");
     });
   }
 

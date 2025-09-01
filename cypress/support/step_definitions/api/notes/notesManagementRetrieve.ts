@@ -98,17 +98,20 @@ Then("the response should contain the correct note details", () => {
   });
 });
 
-Then("the user should receive a not found error", () => {
+Then("the user should receive a bad request error", () => {
   cy.get("@apiResponse").then((response) => {
-    notesAPI.validateResponseStatusCode(response, StatusCode.ClientErrorNotFound);
+    notesAPI.validateResponseStatusCode(
+      response,
+      StatusCode.ClientErrorBadRequest
+    );
   });
 });
 
-Then("the error message should indicate the note was not found", () => {
+Then("the error message should indicate the note has invalid id", () => {
   cy.get("@apiResponse").then((response) => {
     const actualResponse = notesAPI.normalizeResponse(response);
     expect(actualResponse.body).to.have.property("message");
-    expect(actualResponse.body.message).to.match(/not found|does not exist/i);
+    expect(actualResponse.body.message).to.eq('Note ID must be a valid ID');
   });
 });
 

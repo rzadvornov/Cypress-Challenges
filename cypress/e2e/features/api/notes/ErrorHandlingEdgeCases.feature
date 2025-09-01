@@ -4,41 +4,40 @@ Feature: API Error Handling and Edge Cases
   So that I can handle failures gracefully
 
   Background:
-    Given the Notes API is available at "https://practice.expandtesting.com/notes/api"
+    Given the Notes API is available
 
   @negative @security
-  Scenario: Access notes without authentication
-    Given I am not authenticated
-    When I attempt to retrieve notes
-    Then I should receive an unauthorized error
-    And the error code should be 401
+  Scenario: Unauthenticated user cannot retrieve notes
+    Given no user is authenticated
+    When a request is made to retrieve notes
+    Then the response status should be 401 (Unauthorized)
+    And the response body should indicate an authentication error
 
   @negative @security
-  Scenario: Access another user's notes
-    Given I am logged in as user A
-    And another user B has created notes
-    When I attempt to access user B's notes
-    Then I should receive a forbidden error or empty result
-    And I should not see user B's notes
+  Scenario: User cannot access another user's notes
+    Given a valid user "A" is authenticated
+    And a different user "B" has existing notes
+    When a request is made to retrieve notes for user "B"
+    Then the response status should be 403 (Forbidden)
+    And the response must not contain any of user "B"'s notes
 
   @negative
-  Scenario: Handle malformed request data
-    Given I am logged in as a valid user
-    When I send a request with malformed JSON
-    Then I should receive a bad request error
-    And the error should indicate invalid request format
+  Scenario: System rejects a malformed request
+    Given a valid user is authenticated
+    When a request with malformed JSON is sent
+    Then the response status should be 400 (Bad Request)
+    And the response should indicate an invalid request format
 
   @negative
-  Scenario: Handle extremely long note content
-    Given I am logged in as a valid user
-    When I attempt to create a note with extremely long content
-    Then I should receive appropriate validation response
-    And the system should handle the request gracefully
+  Scenario: System rejects a note with extremely long content
+    Given a valid user is authenticated
+    When a request is made to create a note with content exceeding the limit
+    Then the response status should be 400 (Bad Request)
+    And the response should contain a validation error
 
   @performance
-  Scenario: Handle bulk operations
-    Given I am logged in as a valid user
-    When I create multiple notes in sequence
-    Then all operations should complete successfully
-    And response times should be within acceptable limits
-    
+  Scenario: System handles bulk creation operations performantly
+    Given a valid user is authenticated
+    When multiple notes are created in sequence
+    Then all create operations should respond with 201 (Created)
+    And the response times should remain within acceptable performance limits
