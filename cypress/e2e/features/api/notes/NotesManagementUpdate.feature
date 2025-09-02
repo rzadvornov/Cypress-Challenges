@@ -8,29 +8,32 @@ Feature: Notes Management - Create and Read
     And a user is logged in with valid credentials
 
   @crud
-  Scenario: Update an existing note
-    Given I have created a note
-    When I update the note with new information
-    Then I should receive a successful update response
-    And the note should contain the updated information
-    And the note should have an updated timestamp
+  Scenario: Successfully update an existing note
+    Given the user has an existing note
+    When a request is made to update the note with new valid information
+    Then the response status should be 200
+    And the response should contain the updated note information
+    And the note's last updated timestamp should be changed
 
   @crud
-  Scenario: Partially update a note (PATCH)
-    Given I have created a note with title and description
-    When I update only the title of the note
-    Then I should receive a successful update response
-    And the title should be updated
-    And the description should remain unchanged
+  Scenario: Partially update a note using PATCH
+    Given the user has an existing note with a specific title and description
+    When a PATCH request is made to update only the title field
+    Then the response status should be 200
+    And the note's title should be updated to the new value
+    And the note's description should remain unchanged from its original value
 
   @crud @negative
-  Scenario: Update a non-existent note
-    Given I have a non-existent note ID
-    When I attempt to update the note
-    Then I should receive a not found error
+  Scenario: Attempt to update a note that does not exist
+    Given a note ID that does not exist in the system is provided
+    When a request is made to update the note
+    Then the user should receive a bad request error
+    And the error message should indicate the note has invalid id
 
   @crud @negative
-  Scenario: Update a note with invalid data
-    Given I have created a note
-    When I attempt to update the note with invalid data
-    Then I should receive a validation error
+  Scenario: Attempt to update a note with invalid data
+    Given the user has an existing note
+    When a request is made to update the note with invalid or malformed data
+    Then the user should receive a bad request error
+    And the response should contain validation errors
+    And the note's data should remain unchanged

@@ -1,6 +1,6 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import { registrationPage } from "../../../e2e/ui/pages/RegistrationPage";
-import { StringUtils } from "../../utilities/StringUtils";
+import { GeneralUtils } from "../../utilities/GeneralUtils";
 
 const verifyRegistrationPage = () => {
   registrationPage.verifyPageLoaded();
@@ -13,7 +13,7 @@ Given("the user is on the Registration page", () => {
 Given("the registration form is displayed", verifyRegistrationPage);
 
 Given("the user enters a valid generated username", () => {
-  const username = StringUtils.generateRandomString(10);
+  const username = GeneralUtils.generateRandomString(10);
   registrationPage.fillUsername(username);
 });
 

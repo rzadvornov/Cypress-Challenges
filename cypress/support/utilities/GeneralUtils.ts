@@ -1,4 +1,4 @@
-export class StringUtils {
+export class GeneralUtils {
   static generateRandomString(
     length: number,
     characters: string = "abcdefghijklmnopqrstuvwxyz"
@@ -12,4 +12,8 @@ export class StringUtils {
     const currentDate = new Date();
     return currentDate.toISOString().split("T")[0];
   }
+
+  static getWrappedData = (data: any) => {
+    return data.jquery ? data[0] : data;
+  };
 }

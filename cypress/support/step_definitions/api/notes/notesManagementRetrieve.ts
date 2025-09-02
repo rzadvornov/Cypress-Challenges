@@ -3,11 +3,13 @@ import StatusCode from "status-code-enum";
 import { Note } from "../../../../e2e/api/notes/types/note";
 import { testDataAPI } from "../../../../e2e/api/support/TestDataAPI";
 import { notesAPI } from "../../../../e2e/api/notes/NotesAPI";
+import { GeneralUtils } from "../../../utilities/GeneralUtils";
 
 Given("the user has created several notes", () => {
   cy.get("@authToken").then((token) => {
+    const actualToken = GeneralUtils.getWrappedData(token);
     testDataAPI
-      .createMultipleNotes(token as unknown as string, 3)
+      .createMultipleNotes(actualToken, 3)
       .then((notes: Note[]) => {
         cy.wrap(notes).as("createdNotes");
       });
@@ -16,9 +18,10 @@ Given("the user has created several notes", () => {
 
 Given("the user has created a note", () => {
   cy.get("@authToken").then((token) => {
+    const actualToken = GeneralUtils.getWrappedData(token);
     const noteData = testDataAPI.generateNote();
     testDataAPI
-      .createNote(token as unknown as string, noteData)
+      .createNote(actualToken, noteData)
       .then((note: Note) => {
         cy.wrap(note).as("createdNote");
         cy.wrap(note.id).as("noteId");
@@ -32,7 +35,8 @@ Given("the user has a non-existent note ID", () => {
 
 When("the user retrieves all their notes", () => {
   cy.get("@authToken").then((token) => {
-    notesAPI.getAll(token as unknown as string).then((response) => {
+    const actualToken = GeneralUtils.getWrappedData(token);
+    notesAPI.getAll(actualToken).then((response) => {
       cy.wrap(response).as("apiResponse");
     });
   });
@@ -41,8 +45,10 @@ When("the user retrieves all their notes", () => {
 When("the user retrieves the note by its ID", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteId").then((noteId) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteId = GeneralUtils.getWrappedData(noteId);
       notesAPI
-        .getById(token as unknown as string, noteId as unknown as string)
+        .getById(actualToken, actualNoteId)
         .then((response) => {
           cy.wrap(response).as("apiResponse");
         });
@@ -53,8 +59,10 @@ When("the user retrieves the note by its ID", () => {
 When("the user attempts to retrieve the note", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@nonExistentNoteId").then((noteId) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteId = GeneralUtils.getWrappedData(noteId);
       notesAPI
-        .getById(token as unknown as string, noteId as unknown as string)
+        .getById(actualToken, actualNoteId)
         .then((response) => {
           cy.wrap(response).as("apiResponse");
         });
@@ -115,9 +123,7 @@ Then("the error message should indicate the note has invalid id", () => {
   });
 });
 
-// Cleanup after each scenario
 afterEach(() => {
-  // Clean up test data
   if (testDataAPI) {
     testDataAPI.cleanup();
   }

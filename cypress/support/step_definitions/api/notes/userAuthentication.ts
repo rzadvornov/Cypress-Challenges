@@ -2,6 +2,7 @@ import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import { authAPI } from "../../../../e2e/api/notes/AuthAPI";
 import { testDataAPI } from "../../../../e2e/api/support/TestDataAPI";
 import { StatusCode } from "status-code-enum";
+import { GeneralUtils } from "../../../utilities/GeneralUtils";
 
 let currentUser = {};
 let currentToken = "";
@@ -13,10 +14,6 @@ const createUser = () => {
     expect(token).to.be.a("string").and.not.be.empty;
     cy.wrap(token).as("authToken");
   });
-};
-
-const getWrappedData = (data: any) => {
-  return data.jquery ? data[0] : data;
 };
 
 const extractTokenFromResponse = (response: any) => {
@@ -92,7 +89,7 @@ When("a user logs in with valid credentials", () => {
 
 When("a user attempts to login", () => {
   cy.get("@loginData").then((loginData) => {
-    const actualLoginData = getWrappedData(loginData);
+    const actualLoginData = GeneralUtils.getWrappedData(loginData);
     authAPI.login(actualLoginData).then((response) => {
       apiResponse = response;
       cy.wrap(response).as("loginResponse");

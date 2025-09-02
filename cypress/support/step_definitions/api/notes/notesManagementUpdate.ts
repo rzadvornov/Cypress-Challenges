@@ -4,57 +4,58 @@ import { Note } from "../../../../e2e/api/notes/types/note";
 import { testDataAPI } from "../../../../e2e/api/support/TestDataAPI";
 import { notesAPI } from "../../../../e2e/api/notes/NotesAPI";
 import { NoteUpdate } from "../../../../e2e/api/notes/types/noteUpdate";
+import { GeneralUtils } from "../../../utilities/GeneralUtils";
 
-Given("I have created a note", () => {
+Given("the user has an existing note", () => {
   cy.get("@authToken").then((token) => {
+    const actualToken = GeneralUtils.getWrappedData(token);
     const noteData = testDataAPI.generateNote();
-    testDataAPI
-      .createNote(token as unknown as string, noteData)
-      .then((note: Note) => {
-        cy.wrap(note).as("createdNote");
-        cy.wrap(note.id).as("noteId");
-      });
-  });
-});
-
-Given("I have created a note with title and description", () => {
-  cy.get("@authToken").then((token) => {
-    const noteData = testDataAPI.generateNote({
-      title: "Original Title",
-      description: "Original Description",
+    testDataAPI.createNote(actualToken, noteData).then((note: Note) => {
+      cy.wrap(note).as("createdNote");
+      cy.wrap(note.id).as("noteId");
     });
-    testDataAPI
-      .createNote(token as unknown as string, noteData)
-      .then((note: Note) => {
-        cy.wrap(note).as("createdNote");
-        cy.wrap(note.id).as("noteId");
-      });
   });
 });
 
-Given("I have a non-existent note ID", () => {
+Given(
+  "the user has an existing note with a specific title and description",
+  () => {
+    cy.get("@authToken").then((token) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const noteData = testDataAPI.generateNote({
+        title: "Original Title",
+        description: "Original Description",
+      });
+      testDataAPI.createNote(actualToken, noteData).then((note: Note) => {
+        cy.wrap(note).as("createdNote");
+        cy.wrap(note.id).as("noteId");
+      });
+    });
+  }
+);
+
+Given("a note ID that does not exist in the system is provided", () => {
   cy.wrap("non-existent-update-id-12345").as("nonExistentNoteId");
 });
 
-When("I update the note with new information", () => {
+When("a request is made to update the note with new valid information", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteId").then((noteId) => {
       cy.get("@createdNote").then((note) => {
-        const createdNote = note as unknown as Note;
-        const updatedData = {
+        const actualToken = GeneralUtils.getWrappedData(token);
+        const actualNoteId = GeneralUtils.getWrappedData(noteId);
+        const createdNote = GeneralUtils.getWrappedData(note);
+        const updatedData: NoteUpdate = {
           title: "Updated Title",
           description: "Updated Description",
+          category: "Work",
           completed: !createdNote.completed,
         };
 
         cy.wrap(updatedData).as("updatedNoteData");
 
         notesAPI
-          .update(
-            token as unknown as string,
-            noteId as unknown as string,
-            updatedData
-          )
+          .update(actualToken, actualNoteId, updatedData)
           .then((response) => {
             cy.wrap(response).as("apiResponse");
             if (response.status === StatusCode.SuccessOK) {
@@ -66,21 +67,20 @@ When("I update the note with new information", () => {
   });
 });
 
-When("I update only the title of the note", () => {
+When("a PATCH request is made to update only the title field", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteId").then((noteId) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteId = GeneralUtils.getWrappedData(noteId);
       const partialUpdate = {
         title: "Updated Title Only",
+        completed: false,
       };
 
       cy.wrap(partialUpdate).as("updatedNoteData");
 
       notesAPI
-        .patch(
-          token as unknown as string,
-          noteId as unknown as string,
-          partialUpdate
-        )
+        .patch(actualToken, actualNoteId, partialUpdate)
         .then((response) => {
           cy.wrap(response).as("apiResponse");
           if (response.status === StatusCode.SuccessOK) {
@@ -91,16 +91,14 @@ When("I update only the title of the note", () => {
   });
 });
 
-When("I attempt to update the note", () => {
+When("a request is made to update the note", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@nonExistentNoteId").then((noteId) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteId = GeneralUtils.getWrappedData(noteId);
       const updateData = { title: "Updated Title" };
       notesAPI
-        .update(
-          token as unknown as string,
-          noteId as unknown as string,
-          updateData
-        )
+        .update(actualToken, actualNoteId, updateData)
         .then((response) => {
           cy.wrap(response).as("apiResponse");
         });
@@ -108,28 +106,29 @@ When("I attempt to update the note", () => {
   });
 });
 
-When("I attempt to update the note with invalid data", () => {
-  cy.get("@authToken").then((token) => {
-    cy.get("@noteId").then((noteId) => {
-      const invalidData = {
-        title: "", // Assuming empty title is invalid
-        description: undefined,
-      };
+When(
+  "a request is made to update the note with invalid or malformed data",
+  () => {
+    cy.get("@authToken").then((token) => {
+      cy.get("@noteId").then((noteId) => {
+        const actualToken = GeneralUtils.getWrappedData(token);
+        const actualNoteId = GeneralUtils.getWrappedData(noteId);
+        const invalidData = {
+          title: "", // Assuming empty title is invalid
+          description: undefined,
+        };
 
-      notesAPI
-        .update(
-          token as unknown as string,
-          noteId as unknown as string,
-          invalidData
-        )
-        .then((response) => {
-          cy.wrap(response).as("apiResponse");
-        });
+        notesAPI
+          .update(actualToken, actualNoteId, invalidData)
+          .then((response) => {
+            cy.wrap(response).as("apiResponse");
+          });
+      });
     });
-  });
-});
+  }
+);
 
-Then("I should receive a successful update response", () => {
+Then("the response status should be 200", () => {
   cy.get("@apiResponse").then((response) => {
     notesAPI.validateResponseStatusCode(response, StatusCode.SuccessOK);
     const actualResponse = notesAPI.normalizeResponse(response);
@@ -137,10 +136,10 @@ Then("I should receive a successful update response", () => {
   });
 });
 
-Then("the note should contain the updated information", () => {
+Then("the response should contain the updated note information", () => {
   cy.get("@updatedNote").then((note) => {
     cy.get("@updatedNoteData").then((updateData) => {
-      const updatedNote = note as unknown as Note;
+      const updatedNote = GeneralUtils.getWrappedData(note);
       const updatedNoteData = updateData as Partial<NoteUpdate>;
 
       if (updatedNoteData.title) {
@@ -156,54 +155,80 @@ Then("the note should contain the updated information", () => {
   });
 });
 
-Then("the note should have an updated timestamp", () => {
+Then("the note's last updated timestamp should be changed", () => {
   cy.get("@updatedNote").then((note) => {
-    const updatedNote = note as unknown as Note;
+    const updatedNote = GeneralUtils.getWrappedData(note);
     expect(new Date(updatedNote.updated_at)).to.be.instanceOf(Date);
-    // The updated timestamp should be different from created timestamp
     expect(updatedNote.updated_at).to.not.equal(updatedNote.created_at);
   });
 });
 
-Then("the title should be updated", () => {
+Then("the note's title should be updated to the new value", () => {
   cy.get("@updatedNote").then((note) => {
     cy.get("@updatedNoteData").then((updateData) => {
-      const updatedNote = note as unknown as Note;
+      const updatedNote = GeneralUtils.getWrappedData(note);
       const updatedNoteData = updateData as Partial<NoteUpdate>;
       expect(updatedNote.title).to.equal(updatedNoteData.title);
     });
   });
 });
 
-Then("the description should remain unchanged", () => {
-  cy.get("@createdNote").then((originalNote) => {
-    cy.get("@updatedNote").then((note) => {
-      const original = originalNote as unknown as Note;
-      const updated = note as unknown as Note;
-      expect(updated.description).to.equal(original.description);
+Then(
+  "the note's description should remain unchanged from its original value",
+  () => {
+    cy.get("@createdNote").then((originalNote) => {
+      cy.get("@updatedNote").then((note) => {
+        const original = GeneralUtils.getWrappedData(originalNote);
+        const updated = GeneralUtils.getWrappedData(note);
+        expect(updated.description).to.equal(original.description);
+      });
+    });
+  }
+);
+
+Then("the response should indicate the resource was not found", () => {
+  cy.get("@apiResponse").then((response) => {
+    const actualResponse = notesAPI.normalizeResponse(response);
+    expect(actualResponse.body).to.have.property("error");
+    expect(actualResponse.body.error).to.include("not found");
+  });
+});
+
+Then("the response should contain validation errors", () => {
+  cy.get("@apiResponse").then((response) => {
+    const actualResponse = notesAPI.normalizeResponse(response);
+    expect(actualResponse.body).to.have.property("errors");
+    expect(actualResponse.body.errors).to.be.an("array").that.is.not.empty;
+  });
+});
+
+Then("the note's data should remain unchanged", () => {
+  cy.get("@authToken").then((token) => {
+    cy.get("@createdNote").then((note) => {
+      cy.get("@noteId").then((noteId) => {
+        const createdNote = GeneralUtils.getWrappedData(note);
+        const actualToken = GeneralUtils.getWrappedData(token);
+        const actualNoteId = GeneralUtils.getWrappedData(noteId);
+        notesAPI.getById(actualToken, actualNoteId).then((response) => {
+          expect(response.body.data).not.be.empty;
+          expect(response.body.data.id).to.be.eq(actualNoteId);
+          expect(response.body.data.category).to.be.eq(createdNote.category);
+          expect(response.body.data.completed).to.be.eq(createdNote.completed);
+          expect(response.body.data.description).to.be.eq(
+            createdNote.description
+          );
+          expect(response.body.data.title).to.be.eq(createdNote.title);
+          expect(response.body.data.updated_at).to.be.eq(
+            createdNote.updated_at
+          );
+          expect(response.body.data.user_id).to.be.eq(createdNote.user_id);
+        });
+      });
     });
   });
 });
 
-Then("I should receive a not found error", () => {
-  cy.get("@apiResponse").then((response) => {
-    notesAPI.validateResponseStatusCode(response, StatusCode.ClientErrorNotFound);
-  });
-});
-
-Then("I should receive a validation error", () => {
-  cy.get("@apiResponse").then((response) => {
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.status).to.be.oneOf([
-      StatusCode.ClientErrorBadRequest,
-      StatusCode.ClientErrorUnprocessableEntity,
-    ]);
-  });
-});
-
-// Cleanup after each scenario
 afterEach(() => {
-  // Clean up test data
   if (testDataAPI) {
     testDataAPI.cleanup();
   }

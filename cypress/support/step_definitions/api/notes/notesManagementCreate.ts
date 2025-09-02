@@ -1,9 +1,8 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import StatusCode from "status-code-enum";
-import { Note } from "../../../../e2e/api/notes/types/note";
-import { NoteCreate } from "../../../../e2e/api/notes/types/noteCreate";
 import { testDataAPI } from "../../../../e2e/api/support/TestDataAPI";
 import { notesAPI } from "../../../../e2e/api/notes/NotesAPI";
+import { GeneralUtils } from "../../../utilities/GeneralUtils";
 
 Given("the user has valid note data", () => {
   const noteData = testDataAPI.generateNote();
@@ -19,17 +18,17 @@ Given("the user has note data with only a title", () => {
 });
 
 Given("the user has incomplete note data", () => {
-  const incompleteData = {
-    // Missing required fields
-  };
+  const incompleteData = {};
   cy.wrap(incompleteData).as("noteData");
 });
 
 When("the user creates a new note", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteData").then((noteData) => {
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteData = GeneralUtils.getWrappedData(noteData);
       notesAPI
-        .create(token as unknown as string, noteData as unknown as NoteCreate)
+        .create(actualToken, actualNoteData)
         .then((response) => {
           cy.wrap(response).as("apiResponse");
           if (response.status === StatusCode.SuccessOK) {
@@ -44,11 +43,11 @@ When("the user creates a new note", () => {
 When("the user attempts to create a new note", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteData").then((noteData) => {
-      notesAPI
-        .create(token as unknown as string, noteData as unknown as NoteCreate)
-        .then((response) => {
-          cy.wrap(response).as("apiResponse");
-        });
+      const actualToken = GeneralUtils.getWrappedData(token);
+      const actualNoteData = GeneralUtils.getWrappedData(noteData);
+      notesAPI.create(actualToken, actualNoteData).then((response) => {
+        cy.wrap(response).as("apiResponse");
+      });
     });
   });
 });
@@ -63,7 +62,7 @@ Then("the user should receive a successful creation response", () => {
 
 Then("the response should include the note ID", () => {
   cy.get("@createdNote").then((note) => {
-    const createdNote = note as unknown as Note;
+    const createdNote = GeneralUtils.getWrappedData(note);
     expect(createdNote).to.have.property("id");
     expect(createdNote.id).to.be.a("string").and.not.be.empty;
   });
@@ -72,8 +71,8 @@ Then("the response should include the note ID", () => {
 Then("the note should contain the provided title and description", () => {
   cy.get("@createdNote").then((note) => {
     cy.get("@noteData").then((noteData) => {
-      const createdNote = note as unknown as Note;
-      const originalData = noteData as unknown as NoteCreate;
+      const createdNote = GeneralUtils.getWrappedData(note);
+      const originalData = GeneralUtils.getWrappedData(noteData);
       expect(createdNote.title).to.equal(originalData.title);
       expect(createdNote.description).to.equal(originalData.description);
     });
@@ -82,7 +81,7 @@ Then("the note should contain the provided title and description", () => {
 
 Then("the note should have a creation timestamp", () => {
   cy.get("@createdNote").then((note) => {
-    const createdNote = note as unknown as Note;
+    const createdNote = GeneralUtils.getWrappedData(note);
     expect(createdNote).to.have.property("created_at");
     expect(createdNote).to.have.property("updated_at");
     expect(new Date(createdNote.created_at)).to.be.instanceOf(Date);
@@ -92,7 +91,7 @@ Then("the note should have a creation timestamp", () => {
 
 Then("the note description should be empty or null", () => {
   cy.get("@createdNote").then((note) => {
-    const createdNote = note as unknown as Note;
+    const createdNote = GeneralUtils.getWrappedData(note);
     expect(createdNote.description).to.satisfy(
       (desc: string) => desc === "" || desc === null || desc === undefined
     );
@@ -129,9 +128,7 @@ Then("the error should specify missing description field", () => {
   });
 });
 
-// Cleanup after each scenario
 afterEach(() => {
-  // Clean up test data
   if (testDataAPI) {
     testDataAPI.cleanup();
   }

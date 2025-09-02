@@ -1,4 +1,6 @@
 export interface Note {
+  user_id?: string;
+  category?: "Home" | "Work" | "Personal";
   data: any;
   id: string;
   title: string;

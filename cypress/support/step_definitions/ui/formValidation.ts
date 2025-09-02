@@ -1,6 +1,6 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import { formValidationPage } from "../../../e2e/ui/pages/FormValidationPage";
-import { StringUtils } from "../../utilities/StringUtils";
+import { GeneralUtils } from "../../utilities/GeneralUtils";
 
 const verifyFormValidationPage = () => {
   formValidationPage.verifyPageLoaded();
@@ -24,7 +24,7 @@ Given(
 );
 
 Given("the user enters a valid 'Contact Name'", () => {
-  const contactName = StringUtils.generateRandomString(5);
+  const contactName = GeneralUtils.generateRandomString(5);
   formValidationPage.fillContactName(contactName);
 });
 
@@ -33,7 +33,7 @@ Given("the user enters valid phone number {string}", (phoneNumber: string) => {
 });
 
 Given("the user enters todays date", () => {
-  formValidationPage.fillDate(StringUtils.getCurrentDateStringISOFormat());
+  formValidationPage.fillDate(GeneralUtils.getCurrentDateStringISOFormat());
 });
 
 Given(

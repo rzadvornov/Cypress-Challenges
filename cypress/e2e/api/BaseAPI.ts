@@ -1,5 +1,6 @@
 import { HTTPMethod } from "http-method-enum";
 import { StatusCode } from "status-code-enum";
+import { ApiResponse } from "./notes/types/apiResponse";
 
 export class BaseAPI {
   baseUrl: string;
@@ -21,7 +22,7 @@ export class BaseAPI {
     body?: any;
     timeout?: number;
     qs?: Record<string, any>;
-  }): Cypress.Chainable {
+  }): Cypress.Chainable<Cypress.Response<any>> {
     const defaultOptions = {
       method: HTTPMethod.GET,
       failOnStatusCode: false,
@@ -97,7 +98,7 @@ export class BaseAPI {
    * @param {number} expectedStatus - Expected HTTP status
    */
   validateStandardResponse(
-    response: Cypress.Response<any> | JQuery<HTMLElement>,
+    response: Cypress.Response<ApiResponse<any>> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ): void {
     const actualResponse = this.normalizeResponse(response);
@@ -123,7 +124,7 @@ export class BaseAPI {
    * Wait for API to be ready
    * @returns {Cypress.Chainable} - Health check response
    */
-  waitForAPIReady(): Cypress.Chainable {
+  waitForAPIReady(): Cypress.Chainable<Cypress.Response<void>> {
     return this.request({
       method: HTTPMethod.GET,
       url: Cypress.env("health_check_url"),

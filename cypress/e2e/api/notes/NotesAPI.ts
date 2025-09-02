@@ -34,7 +34,7 @@ export class NotesAPI extends BaseAPI {
   getAll(
     token: string,
     queryParams: Record<string, string | number | boolean> = {}
-  ): Cypress.Chainable<Cypress.Response<{ data: Note[] }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note[]>>> {
     const queryString = new URLSearchParams(
       queryParams as Record<string, string>
     ).toString();
@@ -58,7 +58,7 @@ export class NotesAPI extends BaseAPI {
   getById(
     token: string,
     noteId: string
-  ): Cypress.Chainable<Cypress.Response<{ data: Note }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>> {
     return this.request({
       method: HTTPMethod.GET,
       url: `${Cypress.env("notes_url")}/${noteId}`,
@@ -77,7 +77,7 @@ export class NotesAPI extends BaseAPI {
     token: string,
     noteId: string,
     noteData: NoteUpdate
-  ): Cypress.Chainable<Cypress.Response<{ data: Note }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>> {
     return this.request({
       method: HTTPMethod.PUT,
       url: `${Cypress.env("notes_url")}/${noteId}`,
@@ -97,7 +97,7 @@ export class NotesAPI extends BaseAPI {
     token: string,
     noteId: string,
     noteData: Partial<NoteUpdate>
-  ): Cypress.Chainable<Cypress.Response<{ data: Note }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>> {
     return this.request({
       method: HTTPMethod.PATCH,
       url: `${Cypress.env("notes_url")}/${noteId}`,
@@ -134,7 +134,7 @@ export class NotesAPI extends BaseAPI {
     token: string,
     searchTerm: string,
     additionalParams: Record<string, string> = {}
-  ): Cypress.Chainable<Cypress.Response<{ data: Note[] }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note[]>>> {
     const queryParams = {
       search: searchTerm,
       ...additionalParams,
@@ -151,7 +151,7 @@ export class NotesAPI extends BaseAPI {
   filterByCompletion(
     token: string,
     completed: boolean
-  ): Cypress.Chainable<Cypress.Response<{ data: Note[] }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note[]>>> {
     return this.getAll(token, { completed });
   }
 
@@ -166,7 +166,7 @@ export class NotesAPI extends BaseAPI {
     token: string,
     fromDate: string,
     toDate: string
-  ): Cypress.Chainable<Cypress.Response<{ data: Note[] }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note[]>>> {
     return this.getAll(token, {
       from: fromDate,
       to: toDate,
@@ -184,7 +184,7 @@ export class NotesAPI extends BaseAPI {
     token: string,
     noteId: string,
     completed: boolean
-  ): Cypress.Chainable<Cypress.Response<{ data: Note }>> {
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<Note>>> {
     return this.patch(token, noteId, { completed });
   }
 
@@ -265,7 +265,7 @@ export class NotesAPI extends BaseAPI {
    * @param {number} expectedStatus - Expected status code
    */
   validateNotesListResponse(
-    response: Cypress.Response<{ data: Note[] }> | JQuery<HTMLElement>,
+    response: Cypress.Response<ApiResponse<Note[]>> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ): void {
     const actualResponse = this.normalizeResponse(response);
@@ -285,7 +285,7 @@ export class NotesAPI extends BaseAPI {
    * @param {number} expectedStatus - Expected status code
    */
   validateNoteResponse(
-    response: Cypress.Response<{ data: Note }> | JQuery<HTMLElement>,
+    response: Cypress.Response<ApiResponse<Note>> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
   ): void {
     const actualResponse = this.normalizeResponse(response);

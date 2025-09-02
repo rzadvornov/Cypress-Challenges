@@ -2,6 +2,7 @@ import { BaseAPI } from "../BaseAPI";
 import { HTTPMethod } from "http-method-enum";
 import { StatusCode } from "status-code-enum";
 import { User } from "../support/types/user";
+import { ApiResponse } from "./types/apiResponse";
 
 export class AuthAPI extends BaseAPI {
   /**
@@ -9,7 +10,9 @@ export class AuthAPI extends BaseAPI {
    * @param {Object} userData - User registration data
    * @returns {Cypress.Chainable} - Registration response
    */
-  register(userData: any) {
+  register(
+    userData: any
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<any>>> {
     return this.request({
       method: HTTPMethod.POST,
       url: `${Cypress.env("register_user_url")}`,
@@ -22,7 +25,12 @@ export class AuthAPI extends BaseAPI {
    * @param {Object} credentials - Login credentials
    * @returns {Cypress.Chainable} - Login response
    */
-  login(credentials: { email: string; password: string }) {
+  login(credentials: {
+    email: string;
+    password: string;
+  }): Cypress.Chainable<
+    Cypress.Response<ApiResponse<{ token: string; user: User }>>
+  > {
     return this.request({
       method: HTTPMethod.POST,
       url: `${Cypress.env("login_user_url")}`,
@@ -35,7 +43,7 @@ export class AuthAPI extends BaseAPI {
    * @param {string} token - Auth token
    * @returns {Cypress.Chainable} - Logout response
    */
-  logout(token: string) {
+  logout(token: string): Cypress.Chainable<Cypress.Response<void>> {
     return this.request({
       method: HTTPMethod.DELETE,
       url: `${Cypress.env("logout_user_url")}`,
@@ -48,7 +56,9 @@ export class AuthAPI extends BaseAPI {
    * @param {string} token - Auth token
    * @returns {Cypress.Chainable} - Profile response
    */
-  getProfile(token: string) {
+  getProfile(
+    token: string
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<{ user: User }>>> {
     return this.request({
       method: HTTPMethod.GET,
       url: `${Cypress.env("profile_user_url")}`,
@@ -62,7 +72,10 @@ export class AuthAPI extends BaseAPI {
    * @param {Object} passwordData - Password change data
    * @returns {Cypress.Chainable} - Password change response
    */
-  changePassword(token: string, passwordData: any) {
+  changePassword(
+    token: string,
+    passwordData: any
+  ): Cypress.Chainable<Cypress.Response<ApiResponse<any>>> {
     return this.request({
       method: HTTPMethod.POST,
       url: `${Cypress.env("change_password_user_url")}`,
@@ -76,7 +89,7 @@ export class AuthAPI extends BaseAPI {
    * @param {string} token - Auth token
    * @returns {Cypress.Chainable} - Delete response
    */
-  deleteAccount(token: string) {
+  deleteAccount(token: string): Cypress.Chainable<Cypress.Response<void>> {
     return this.request({
       method: HTTPMethod.DELETE,
       url: `${Cypress.env("delete_account_user_url")}`,
@@ -89,7 +102,10 @@ export class AuthAPI extends BaseAPI {
    * @param {Object} userData - User data
    * @returns {Cypress.Chainable} - Login response with token
    */
-  registerAndLogin(userData: { email: string; password: string }) {
+  registerAndLogin(userData: {
+    email: string;
+    password: string;
+  }): Cypress.Chainable<string> {
     return this.register(userData).then(() => {
       return this.login({
         email: userData.email,
@@ -104,7 +120,11 @@ export class AuthAPI extends BaseAPI {
    * Validate user data structure
    * @param {Object} user - User object
    */
-  validateUserStructure(user: { id: string; name: string; email: string }) {
+  validateUserStructure(user: {
+    id: string;
+    name: string;
+    email: string;
+  }): void {
     this.validateUserData(user);
   }
 
@@ -112,14 +132,18 @@ export class AuthAPI extends BaseAPI {
    * Validate registration data structure
    * @param {Object} data - Data object
    */
-  validateDataStructure(data: { id: string; name: string; email: string }) {
+  validateDataStructure(data: {
+    id: string;
+    name: string;
+    email: string;
+  }): void {
     this.validateUserData(data);
   }
 
   /**
    * Validate user data structure
    */
-  validateUserData(data: Partial<User>) {
+  validateUserData(data: Partial<User>): void {
     const requiredProperties = ["id", "name", "email"] as const;
 
     requiredProperties.forEach((prop) => {
@@ -136,9 +160,9 @@ export class AuthAPI extends BaseAPI {
    * @param {number} expectedStatus - Expected status code
    */
   validateAuthResponse(
-    response: Cypress.Response<any> | JQuery<HTMLElement>,
+    response: Cypress.Response<ApiResponse<any>> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
-  ) {
+  ): void {
     const actualResponse = this.normalizeResponse(response);
     this.validateStandardResponse(actualResponse, expectedStatus);
 
@@ -159,9 +183,9 @@ export class AuthAPI extends BaseAPI {
    * @param {number} expectedStatus - Expected status code
    */
   validateRegistrationResponse(
-    response: Cypress.Response<any> | JQuery<HTMLElement>,
+    response: Cypress.Response<ApiResponse<any>> | JQuery<HTMLElement>,
     expectedStatus = StatusCode.SuccessOK
-  ) {
+  ): void {
     const actualResponse = this.normalizeResponse(response);
     this.validateStandardResponse(actualResponse, expectedStatus);
 
