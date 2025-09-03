@@ -128,14 +128,6 @@ When(
   }
 );
 
-Then("the response status should be 200", () => {
-  cy.get("@apiResponse").then((response) => {
-    notesAPI.validateResponseStatusCode(response, StatusCode.SuccessOK);
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.body).to.have.property("data");
-  });
-});
-
 Then("the response should contain the updated note information", () => {
   cy.get("@updatedNote").then((note) => {
     cy.get("@updatedNoteData").then((updateData) => {
@@ -186,19 +178,11 @@ Then(
   }
 );
 
-Then("the response should indicate the resource was not found", () => {
+Then("the response should contain a validation error", () => {
   cy.get("@apiResponse").then((response) => {
     const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.body).to.have.property("error");
-    expect(actualResponse.body.error).to.include("not found");
-  });
-});
-
-Then("the response should contain validation errors", () => {
-  cy.get("@apiResponse").then((response) => {
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.body).to.have.property("errors");
-    expect(actualResponse.body.errors).to.be.an("array").that.is.not.empty;
+    expect(actualResponse.body).to.have.property("message");
+    expect(actualResponse.body.message).to.be.eq('Title must be between 4 and 100 characters');
   });
 });
 

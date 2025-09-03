@@ -52,14 +52,6 @@ When("the user attempts to create a new note", () => {
   });
 });
 
-Then("the user should receive a successful creation response", () => {
-  cy.get("@apiResponse").then((response) => {
-    notesAPI.validateResponseStatusCode(response, StatusCode.SuccessOK);
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.body).to.have.property("data");
-  });
-});
-
 Then("the response should include the note ID", () => {
   cy.get("@createdNote").then((note) => {
     const createdNote = GeneralUtils.getWrappedData(note);
@@ -108,16 +100,6 @@ Then("the error should specify missing title field", () => {
   });
 });
 
-Then("the user should receive a validation error", () => {
-  cy.get("@apiResponse").then((response) => {
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.status).to.be.oneOf([
-      StatusCode.ClientErrorBadRequest,
-      StatusCode.ClientErrorUnprocessableEntity,
-    ]);
-  });
-});
-
 Then("the error should specify missing description field", () => {
   cy.get("@apiResponse").then((response) => {
     const actualResponse = notesAPI.normalizeResponse(response);
@@ -125,6 +107,26 @@ Then("the error should specify missing description field", () => {
     expect(actualResponse.body.message).to.be.eq(
       "Description must be between 4 and 1000 characters"
     );
+  });
+});
+
+Then("the response status code should be {int}", (statusCodeNumber: number) => {
+  cy.get("@apiResponse").then((response) => {
+    const actualResponse = notesAPI.normalizeResponse(response);
+
+    const expectedStatusName = Object.keys(StatusCode).find(
+      (key) => StatusCode[key as keyof typeof StatusCode] === statusCodeNumber
+    );
+
+    if (expectedStatusName) {
+      const expectedStatusCode =
+        StatusCode[expectedStatusName as keyof typeof StatusCode];
+      expect(actualResponse.status).to.equal(expectedStatusCode);
+    } else {
+      throw new Error(
+        `Status code ${statusCodeNumber} not found in StatusCode enum.`
+      );
+    }
   });
 });
 

@@ -11,7 +11,7 @@ Feature: Notes Management - Create and Read
   Scenario: Retrieve all notes for authenticated user
     Given the user has created several notes
     When the user retrieves all their notes
-    Then the user should receive a successful response
+    Then the response status code should be 200
     And the response should contain all the user's notes
     And each note should have an ID, title, description, and timestamps
 
@@ -19,12 +19,12 @@ Feature: Notes Management - Create and Read
   Scenario: Retrieve a specific note by ID
     Given the user has created a note
     When the user retrieves the note by its ID
-    Then the user should receive a successful response
+    Then the response status code should be 200
     And the response should contain the correct note details
 
   @crud @negative
   Scenario: Retrieve a non-existent note
     Given the user has a non-existent note ID
     When the user attempts to retrieve the note
-    Then the user should receive a bad request error
+    Then the response status code should be 400
     And the error message should indicate the note has invalid id

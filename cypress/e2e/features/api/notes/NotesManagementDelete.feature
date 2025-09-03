@@ -11,14 +11,14 @@ Feature: Notes Management - Create and Read
   Scenario: Delete an existing note
     Given the user has an existing note
     When a request is made to delete the note
-    Then the response status should be 200 or 204
+    Then the response status code should be 200
     And the note should no longer exist in the system
 
   @crud @negative
   Scenario: Delete a non-existent note
     Given a note ID that does not exist in the system is provided
     When a request is made to delete the unexistent note
-    Then the user should receive a bad request error
+    Then the response status code should be 400
     And the error message should indicate the note has invalid id
 
   @crud

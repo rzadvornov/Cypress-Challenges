@@ -70,12 +70,6 @@ When("the user attempts to retrieve the note", () => {
   });
 });
 
-Then("the user should receive a successful response", () => {
-  cy.get("@apiResponse").then((response) => {
-    notesAPI.validateResponseStatusCode(response, StatusCode.SuccessOK);
-  });
-});
-
 Then("the response should contain all the user's notes", () => {
   cy.get("@apiResponse").then((response) => {
     const actualResponse = notesAPI.normalizeResponse(response);

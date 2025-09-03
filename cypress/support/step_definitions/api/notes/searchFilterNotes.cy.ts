@@ -141,7 +141,7 @@ When("a filter is applied for the {string} status", (status: string) => {
   cy.get("@authToken").then((token) => {
     const isCompleted = status === "completed";
     const actualToken = GeneralUtils.getWrappedData(token);
-    notesAPI.filterByCompletion(actualToken, isCompleted).as("filterResponse");
+    notesAPI.filterByCompletion(actualToken, isCompleted).as("apiResponse");
     cy.wrap(isCompleted).as("filterStatus");
   });
 });
@@ -206,7 +206,7 @@ Then("the result set should be empty", () => {
 Then(
   "the response should only contain notes with a status of {string}",
   (status: string) => {
-    cy.get("@filterResponse").then((response) => {
+    cy.get("@apiResponse").then((response) => {
       const actualResponse = notesAPI.normalizeResponse(response);
       const notes: Note[] = actualResponse.body.data;
       const expectedStatus = status === "completed";

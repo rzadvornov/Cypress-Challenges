@@ -28,16 +28,6 @@ When("a request is made to delete the unexistent note", () => {
   });
 });
 
-Then("the response status should be 200 or 204", () => {
-  cy.get("@apiResponse").then((response) => {
-    const actualResponse = notesAPI.normalizeResponse(response);
-    expect(actualResponse.status).to.be.oneOf([
-      StatusCode.SuccessOK,
-      StatusCode.SuccessNoContent,
-    ]);
-  });
-});
-
 Then("the note should no longer exist in the system", () => {
   cy.get("@authToken").then((token) => {
     cy.get("@noteId").then((noteId) => {

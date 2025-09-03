@@ -173,22 +173,20 @@ export class TestDataAPI {
       this.generateNote({ completed: false, title: "Pending Note 2" }),
     ];
 
-    return cy
-      .wrap(this.notesAPI.createMultiple(token, notes))
-      .then((responses) => {
-        const createdNotes = (
-          responses as unknown as Cypress.Response<Note>[]
-        ).map((response) => {
-          const note = response.body.data;
-          this.createdNotes.push({ id: note.id, token });
-          return note;
-        });
-
-        return {
-          completed: createdNotes.filter((note) => note.completed),
-          pending: createdNotes.filter((note) => !note.completed),
-        };
+    return this.notesAPI.createMultiple(token, notes).then((responses) => {
+      const createdNotes = (
+        responses as unknown as Cypress.Response<Note>[]
+      ).map((response) => {
+        const note = response.body.data;
+        this.createdNotes.push({ id: note.id, token });
+        return note;
       });
+
+      return {
+        completed: createdNotes.filter((note) => note.completed),
+        pending: createdNotes.filter((note) => !note.completed),
+      };
+    });
   }
 
   /**

@@ -14,6 +14,9 @@ export class GeneralUtils {
   }
 
   static getWrappedData = (data: any) => {
+    if (data === null || data === undefined) {
+      return data;
+    }
     return data.jquery ? data[0] : data;
   };
 }
