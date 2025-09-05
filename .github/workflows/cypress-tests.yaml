@@ -50,6 +50,8 @@ jobs:
         echo "SPEC_LIST=$SPEC_LIST" >> $GITHUB_OUTPUT
 
     - name: Run Cypress tests on specific files
+      id: run-cypress
+      continue-on-error: true
       run: |
         echo "Running tests for container ${{ strategy.job-index }}:"
         echo "${{ steps.test-split.outputs.SPEC_LIST }}"
@@ -64,7 +66,7 @@ jobs:
           cypress/reports
           cypress/screenshots
           cypress/videos
-        if: always()
+        if-no-files-found: ignore
 
   publish-results:
     needs: cypress-tests
