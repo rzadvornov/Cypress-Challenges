@@ -5,12 +5,10 @@ set -e
 
 echo "Running Cypress tests in parallel with cypress-split"
 
-# The npm exec command is a more robust way to run package executables.
-# This script explicitly uses the environment variables to split the tests.
-npx cypress-split run \
-  --ci-build-id ${GITHUB_RUN_ID} \
+# The most reliable way to run a local executable is by using its full path.
+./node_modules/.bin/cypress-split run \
+  --ci-build-id "${GITHUB_RUN_ID}" \
   --parallel \
-  --record false \
   --group "Machine ${SPLIT_MACHINE_INDEX}" \
   "$@"
 
