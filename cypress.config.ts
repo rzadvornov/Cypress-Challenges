@@ -35,7 +35,7 @@ export default defineConfig({
     baseUrl: "https://practice.expandtesting.com",
     specPattern: "**/*.feature",
     experimentalRunAllSpecs: false,
-    video: true,
+    video: false,
     screenshotOnRunFailure: true,
     testIsolation: true,
     defaultCommandTimeout: 10000,
