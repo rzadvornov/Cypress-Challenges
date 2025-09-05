@@ -4,9 +4,6 @@ FROM cypress/included:14.5.4
 # Set working directory
 WORKDIR /e2e
 
-# Install global dependencies
-RUN npm install -g @percy/cli cypress-split
-
 # Copy package files
 COPY package*.json ./
 COPY .cypress-cucumber-preprocessorrc.json ./
