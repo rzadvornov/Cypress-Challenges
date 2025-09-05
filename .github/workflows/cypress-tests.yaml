@@ -1,0 +1,70 @@
+name: Cypress Tests with Percy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  cypress-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3, 4] # Adjust based on your parallel needs
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t cypress-percy .
+
+    - name: Run Cypress tests in parallel with Percy
+      run: |
+        docker run \
+          -e CYPRESS_RECORD_KEY=$CYPRESS_RECORD_KEY \
+          -e PERCY_TOKEN=$PERCY_TOKEN \
+          -e GITHUB_TOKEN=$GITHUB_TOKEN \
+          -e GITHUB_RUN_ID=$GITHUB_RUN_ID \
+          -e PARALLEL=${{ strategy.job-total }} \
+          -e MACHINE=${{ strategy.job-index }} \
+          cypress-percy
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: cypress-results
+        path: |
+          cypress/reports
+          cypress/screenshots
+          cypress/videos
+
+  publish-results:
+    needs: cypress-tests
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download test results
+      uses: actions/download-artifact@v3
+      with:
+        name: cypress-results
+        path: ./cypress-results
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./cypress-results/cypress/reports
+        keep_files: true
