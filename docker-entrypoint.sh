@@ -10,10 +10,10 @@ echo "CI_BUILD_ID=$CI_BUILD_ID"
 echo "SPLIT_TOTAL=$SPLIT_TOTAL"
 echo "SPLIT_INDEX=$SPLIT_INDEX"
 
-# Use cypress-split CLI instead of the plugin
+# Use node to run the cypress-split run script directly
 if [ "$SPLIT" = "true" ] && [ -n "$CI_BUILD_ID" ]; then
-    echo "Using cypress-split CLI for parallel execution"
-    npx cypress-split run \
+    echo "Using cypress-split for parallel execution"
+    node node_modules/cypress-split/bin/run.js run \
       --ci-build-id "$CI_BUILD_ID" \
       --parallel \
       --group "Machine ${SPLIT_INDEX}" \
