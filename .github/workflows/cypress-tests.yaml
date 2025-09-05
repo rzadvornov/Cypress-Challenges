@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        containers: [1, 2, 3] # Adjust this number to match your desired parallelization level
+        containers: [1, 2, 3] # Cypress Cloud will split tests across these
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -23,14 +23,16 @@ jobs:
     - name: Run Cypress tests in parallel with Cypress Cloud
       run: |
         docker run \
-          -e CI_BUILD_ID=${{ github.run_id }} \
+          -e CI_BUILD_ID=${{ github.run_id }}-${{ github.run_attempt }} \
           -e CYPRESS_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }} \
+          -e ELECTRON_EXTRA_LAUNCH_ARGS="--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader" \
+          -e GITHUB_ACTIONS=true \
           cypress-cloud-image
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
       with:
-        name: cypress-results
+        name: cypress-results-${{ strategy.job-index }}
         path: |
           cypress/reports
           cypress/screenshots
@@ -45,11 +47,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Download test results
-      uses: actions/download-artifact@v4
+    - name: Download all test results
+      uses: actions/download-artifact@v3
       with:
-        name: cypress-results
         path: ./cypress-results
+
+    - name: Combine results
+      run: |
+        mkdir -p combined-results
+        find ./cypress-results -name "*.xml" -exec cp {} ./combined-results/ \;
+        find ./cypress-results -name "*.png" -exec cp {} ./combined-results/ \;
+        find ./cypress-results -name "*.mp4" -exec cp {} ./combined-results/ \;
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -58,5 +66,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./cypress-results/cypress/reports
+        publish_dir: ./combined-results
         keep_files: true
