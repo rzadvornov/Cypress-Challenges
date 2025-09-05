@@ -27,6 +27,7 @@ jobs:
           -e CI_BUILD_ID=${{ github.run_id }} \
           -e SPLIT_TOTAL=${{ strategy.job-total }} \
           -e SPLIT_INDEX=${{ strategy.job-index }} \
+          -e CYPRESS_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }} \
           cypress-split-image
 
     - name: Upload test results
