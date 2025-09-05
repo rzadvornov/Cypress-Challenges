@@ -4,7 +4,8 @@ import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-prepro
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild";
 
 export default defineConfig({
-  projectId: "ey3v8c",
+projectId: "ey3v8c",
+
   env: {
     login_url: "/login",
     shadow_dom_url: "/shadowdom",
@@ -58,20 +59,6 @@ export default defineConfig({
           plugins: [createEsbuildPlugin(config)],
         })
       );
-
-      // Add cypress-split plugin only when environment variables are present
-      // Use a try-catch to prevent configuration errors
-      try {
-        if (process.env.SPLIT === 'true' && process.env.CI_BUILD_ID) {
-          console.log('Initializing cypress-split plugin');
-          // Use require instead of import to avoid timing issues
-          const cypressSplit = require('cypress-split');
-          cypressSplit(on, config);
-        }
-      } catch (error) {
-        console.log('Note: cypress-split initialization may complete during test execution');
-        // Don't throw error, let the plugin initialize during runtime
-      }
 
       // This section is for custom tasks and event listeners.
       on("task", {

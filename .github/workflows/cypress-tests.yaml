@@ -1,4 +1,4 @@
-name: Cypress Parallel Tests
+name: Cypress Parallel Tests with Cypress Cloud
 
 on:
   push:
@@ -18,17 +18,15 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build Docker image
-      run: docker build --no-cache -t cypress-split-image .
+      run: docker build --no-cache -t cypress-cloud-image .
 
-    - name: Run Cypress tests in parallel
+    - name: Run Cypress tests in parallel with Cypress Cloud
       run: |
         docker run \
-          -e SPLIT=true \
           -e CI_BUILD_ID=${{ github.run_id }} \
-          -e SPLIT_TOTAL=${{ strategy.job-total }} \
           -e SPLIT_INDEX=${{ strategy.job-index }} \
           -e CYPRESS_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }} \
-          cypress-split-image
+          cypress-cloud-image
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -49,7 +47,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download test results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: cypress-results
         path: ./cypress-results
