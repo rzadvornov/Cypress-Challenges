@@ -2,9 +2,9 @@ import { defineConfig } from "cypress";
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor";
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild";
+import cypressSplit from "cypress-split";
 
 export default defineConfig({
-  projectId: "ey3v8c",
   env: {
     login_url: "/login",
     shadow_dom_url: "/shadowdom",
@@ -53,6 +53,9 @@ export default defineConfig({
       // preprocessor. If another plugin runs before this, it can overwrite them,
       // leading to state conflicts.
       await addCucumberPreprocessorPlugin(on, config);
+
+      // Add cypress-split plugin for parallel test execution
+      cypressSplit(on, config);
 
       // This is the file preprocessor for your feature files. It correctly
       // uses the esbuild plugin which is required for the cucumber preprocessor.

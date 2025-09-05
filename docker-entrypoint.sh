@@ -4,27 +4,17 @@
 set -e
 
 echo "Running Cypress tests in parallel with cypress-split"
-echo "Current directory: $(pwd)"
+echo "Environment variables:"
+echo "SPLIT=$SPLIT"
+echo "CI_BUILD_ID=$CI_BUILD_ID"
+echo "SPLIT_TOTAL=$SPLIT_TOTAL"
+echo "SPLIT_INDEX=$SPLIT_INDEX"
 
-# Try running cypress-split through npm script or directly with node
-if [ -f "node_modules/cypress-split/bin/run.js" ]; then
-    echo "Running cypress-split via node"
-    node node_modules/cypress-split/bin/run.js run \
-      --ci-build-id "${GITHUB_RUN_ID}" \
-      --parallel \
-      --group "Machine ${SPLIT_MACHINE_INDEX}" \
-      "$@"
-else
-    echo "ERROR: cypress-split run script not found"
-    echo "Trying alternative approach..."
-    
-    # Try running cypress directly with cypress-split plugin
-    npx cypress run \
-      --env split=true,ciBuildId="${GITHUB_RUN_ID}",splitTotal="${SPLIT_TOTAL_MACHINES}",splitIndex="${SPLIT_MACHINE_INDEX}" \
-      --parallel \
-      --group "Machine ${SPLIT_MACHINE_INDEX}" \
-      "$@"
-fi
+# Run regular cypress command - cypress-split plugin will handle the parallelization
+npx cypress run \
+  --parallel \
+  --group "Machine ${SPLIT_INDEX}" \
+  "$@"
 
 # Pass the exit code of the Cypress command.
 exit $?

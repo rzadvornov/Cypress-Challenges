@@ -23,8 +23,10 @@ jobs:
     - name: Run Cypress tests in parallel
       run: |
         docker run \
-          -e SPLIT_TOTAL_MACHINES=${{ strategy.job-total }} \
-          -e SPLIT_MACHINE_INDEX=${{ strategy.job-index }} \
+          -e SPLIT=true \
+          -e CI_BUILD_ID=${{ github.run_id }} \
+          -e SPLIT_TOTAL=${{ strategy.job-total }} \
+          -e SPLIT_INDEX=${{ strategy.job-index }} \
           cypress-split-image
 
     - name: Upload test results
