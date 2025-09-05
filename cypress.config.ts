@@ -4,6 +4,7 @@ import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-prepro
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild";
 
 export default defineConfig({
+  projectId: "ey3v8c",
   env: {
     login_url: "/login",
     shadow_dom_url: "/shadowdom",
@@ -47,9 +48,14 @@ export default defineConfig({
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
-      // This is the most crucial step. Use the preprocessor from the cucumber plugin
-      // to wrap your bundler. This ensures the correct event handling order.
+      // CRITICAL: This MUST be the first line in your setupNodeEvents function.
+      // It registers all the necessary Cypress event handlers for the cucumber
+      // preprocessor. If another plugin runs before this, it can overwrite them,
+      // leading to state conflicts.
       await addCucumberPreprocessorPlugin(on, config);
+
+      // This is the file preprocessor for your feature files. It correctly
+      // uses the esbuild plugin which is required for the cucumber preprocessor.
       on(
         "file:preprocessor",
         createBundler({
@@ -57,7 +63,8 @@ export default defineConfig({
         })
       );
 
-      // Add your custom tasks
+      // This section is for custom tasks and event listeners.
+      // They are placed AFTER the cucumber preprocessor is fully set up.
       on("task", {
         createTestFile({ size, filename }) {
           const fs = require("fs");
@@ -87,7 +94,6 @@ export default defineConfig({
         },
       });
 
-      // Browser launch configuration
       on(
         "before:browser:launch",
         (
