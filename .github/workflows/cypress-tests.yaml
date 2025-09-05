@@ -1,4 +1,4 @@
-name: Cypress Tests with Percy
+name: Cypress Parallel Tests
 
 on:
   push:
@@ -6,33 +6,26 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  BROWSER: chrome
-
 jobs:
   cypress-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        containers: [1] # Adjust based on your parallel needs
+        containers: [1, 2, 3] # Adjust this number to match your desired parallelization level
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Build Docker image
-      run: docker build -t cypress-percy .
+      run: docker build -t cypress-split-image .
 
-    - name: Run Cypress tests in parallel with Percy
+    - name: Run Cypress tests in parallel
       run: |
         docker run \
-          -e PERCY_TOKEN="${{ secrets.PERCY_TOKEN }}" \
-          -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-          -e GITHUB_RUN_ID=$GITHUB_RUN_ID \
-          -e PARALLEL=${{ strategy.job-total }} \
-          -e MACHINE_NUMBER=${{ strategy.job-index }} \
-          -e BROWSER="${{ env.BROWSER }}" \
-          cypress-percy
+          -e SPLIT_TOTAL_MACHINES=${{ strategy.job-total }} \
+          -e SPLIT_MACHINE_INDEX=${{ strategy.job-index }} \
+          cypress-split-image
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -42,6 +35,7 @@ jobs:
           cypress/reports
           cypress/screenshots
           cypress/videos
+        if-no-files-found: ignore
 
   publish-results:
     needs: cypress-tests

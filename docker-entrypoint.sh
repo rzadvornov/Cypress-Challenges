@@ -1,47 +1,18 @@
 #!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Set default values if environment variables are not set
-PARALLEL=${PARALLEL:-1}
-MACHINE_NUMBER=${MACHINE_NUMBER:-1}
-GITHUB_RUN_ID=${GITHUB_RUN_ID:-local-run}
+echo "Running Cypress tests in parallel on CI using cypress-split"
 
-# Build the Cypress command
-CYPRESS_CMD="npx cypress run"
+# The cypress-split command will handle parallelization,
+# using the environment variables from the GitHub Actions workflow.
+npx cypress-split run \
+  --ci \
+  --total "${SPLIT_TOTAL_MACHINES}" \
+  --group "${SPLIT_MACHINE_INDEX}" \
+  "$@"
 
-# Add record option if CYPRESS_RECORD_KEY is set
-if [ -n "$CYPRESS_RECORD_KEY" ]; then
-    CYPRESS_CMD="$CYPRESS_CMD --record"
-    
-    # Add parallel option if PARALLEL > 1
-    if [ "$PARALLEL" -gt 1 ]; then
-        CYPRESS_CMD="$CYPRESS_CMD --parallel"
-    fi
-    
-    # Add CI build ID
-    CYPRESS_CMD="$CYPRESS_CMD --ci-build-id $GITHUB_RUN_ID"
-    
-    # Add group name
-    CYPRESS_CMD="$CYPRESS_CMD --group \"Cypress Parallel Tests\""
-fi
-
-# Add browser option if specified
-if [ -n "$BROWSER" ]; then
-    CYPRESS_CMD="$CYPRESS_CMD --browser $BROWSER"
-else
-    CYPRESS_CMD="$CYPRESS_CMD --browser chrome"
-fi
-
-# Add additional config if specified
-if [ -n "$CYPRESS_CONFIG" ]; then
-    CYPRESS_CMD="$CYPRESS_CMD --config $CYPRESS_CONFIG"
-fi
-
-echo "Running command: $CYPRESS_CMD"
-eval $CYPRESS_CMD
-
-# Capture the exit code
-EXIT_CODE=$?
-
-# Always exit with the Cypress exit code
-exit $EXIT_CODE
+# Pass the exit code of the Cypress command.
+# This ensures the CI job fails if any tests fail.
+exit $?
