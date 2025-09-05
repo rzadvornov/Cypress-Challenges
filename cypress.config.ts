@@ -48,6 +48,7 @@ export default defineConfig({
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
+      // Register the cucumber preprocessor plugin FIRST
       await addCucumberPreprocessorPlugin(on, config);
 
       on(
@@ -56,7 +57,7 @@ export default defineConfig({
           plugins: [createEsbuildPlugin(config)],
         })
       );
-
+      
       on("task", {
         createTestFile({ size, filename }) {
           const fs = require("fs");
