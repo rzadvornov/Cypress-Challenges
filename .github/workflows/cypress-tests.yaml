@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        containers: [1, 2, 3, 4] # Adjust based on your parallel needs
+        containers: [1] # Adjust based on your parallel needs
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
