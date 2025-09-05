@@ -23,6 +23,8 @@ USER cypress
 
 # Create an entrypoint script to handle environment variables properly
 COPY --chown=cypress:cypress docker-entrypoint.sh /e2e/docker-entrypoint.sh
+# Fix line endings to be compatible with Linux
+RUN sed -i 's/\r$//' /e2e/docker-entrypoint.sh
 RUN chmod +x /e2e/docker-entrypoint.sh
 
 # Use the entrypoint script
