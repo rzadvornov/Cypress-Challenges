@@ -1,4 +1,4 @@
-name: Cypress Parallel Tests with Cypress Cloud
+name: Cypress Parallel Tests with Manual Splitting
 
 on:
   push:
@@ -26,17 +26,35 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run Cypress tests in parallel
-      uses: cypress-io/github-action@v6
-      with:
-        record: true
-        parallel: true
-        group: "Machine ${{ strategy.job-index }}"
-        ci-build-id: ${{ github.run_id }}-${{ github.run_attempt }}
-        browser: chrome
-      env:
-        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-        ELECTRON_EXTRA_LAUNCH_ARGS: "--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader"
+    - name: Get test files and split manually
+      id: test-split
+      run: |
+        # Get all feature files
+        SPEC_FILES=$(find . -name "*.feature" | sort)
+        echo "All test files:"
+        echo "$SPEC_FILES"
+        
+        # Split files manually across containers
+        TOTAL_FILES=$(echo "$SPEC_FILES" | wc -l)
+        FILES_PER_CONTAINER=$(( ($TOTAL_FILES + ${{ strategy.job-total }} - 1) / ${{ strategy.job-total }} ))
+        START_INDEX=$(( (${{ strategy.job-index }} - 0) * $FILES_PER_CONTAINER ))
+        
+        # Select files for this container
+        MY_FILES=$(echo "$SPEC_FILES" | sed -n "$((START_INDEX + 1)),$((START_INDEX + FILES_PER_CONTAINER))p")
+        
+        echo "Files for container ${{ strategy.job-index }}:"
+        echo "$MY_FILES"
+        
+        # Convert to comma-separated list for Cypress
+        SPEC_LIST=$(echo "$MY_FILES" | tr '\n' ',' | sed 's/,$//')
+        echo "SPEC_LIST=$SPEC_LIST" >> $GITHUB_OUTPUT
+
+    - name: Run Cypress tests on specific files
+      run: |
+        echo "Running tests for container ${{ strategy.job-index }}:"
+        echo "${{ steps.test-split.outputs.SPEC_LIST }}"
+        
+        npx cypress run --spec "${{ steps.test-split.outputs.SPEC_LIST }}"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
