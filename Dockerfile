@@ -32,5 +32,9 @@ RUN groupadd -r cypress && useradd -r -g cypress -m -d /e2e cypress \
 # Switch to non-root user
 USER cypress
 
-# Command to run tests (secrets will be passed at runtime)
-CMD ["sh", "-c", "npx cypress run --record --parallel --ci-build-id ${GITHUB_RUN_ID} --group \"Cypress Parallel Tests\" --browser chrome || true"]
+# Create an entrypoint script to handle environment variables properly
+COPY --chown=cypress:cypress docker-entrypoint.sh /e2e/docker-entrypoint.sh
+RUN chmod +x /e2e/docker-entrypoint.sh
+
+# Use the entrypoint script
+ENTRYPOINT ["/e2e/docker-entrypoint.sh"]
