@@ -57,6 +57,9 @@ jobs:
         echo "${{ steps.test-split.outputs.SPEC_LIST }}"
         
         npx cypress run --spec "${{ steps.test-split.outputs.SPEC_LIST }}"
+          --browser chrome \
+          --config "chromeWebSecurity=false" \
+          --env "ELECTRON_EXTRA_LAUNCH_ARGS=--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
