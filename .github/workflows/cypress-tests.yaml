@@ -33,7 +33,6 @@ jobs:
           -e PARALLEL=${{ strategy.job-total }} \
           -e MACHINE_NUMBER=${{ strategy.job-index }} \
           -e BROWSER="${{ env.BROWSER }}" \
-          -e CYPRESS_INTERNAL_BROWSER_CONNECT_TIMEOUT=300000 \
           cypress-percy
 
     - name: Upload test results
