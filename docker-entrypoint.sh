@@ -10,9 +10,19 @@ echo "CI_BUILD_ID=$CI_BUILD_ID"
 echo "SPLIT_TOTAL=$SPLIT_TOTAL"
 echo "SPLIT_INDEX=$SPLIT_INDEX"
 
-# Run regular cypress command - cypress-split plugin will handle parallelization
-# WITHOUT using --parallel or --group flags (those are for Cypress Cloud)
-npx cypress run "$@"
+# Debug: Show what's in the cypress-split package
+echo "=== Debug: cypress-split package structure ==="
+find node_modules/cypress-split -name "*.js" -type f | head -20
+echo "=== Node modules bin contents ==="
+ls -la node_modules/.bin/ | grep cypress-split
+
+# The correct approach: use regular cypress run with environment variables
+# cypress-split works as a plugin, not a standalone CLI
+echo "Using Cypress with cypress-split plugin via environment variables"
+npx cypress run \
+  --parallel \
+  --group "Machine ${SPLIT_INDEX}" \
+  "$@"
 
 # Pass the exit code of the Cypress command.
 exit $?
