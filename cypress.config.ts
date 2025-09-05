@@ -2,7 +2,6 @@ import { defineConfig } from "cypress";
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor";
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild";
-import cypressSplit from "cypress-split";
 
 export default defineConfig({
   env: {
@@ -50,15 +49,6 @@ export default defineConfig({
     ): Promise<Cypress.PluginConfigOptions> {
       // CRITICAL: This MUST be the first line in your setupNodeEvents function.
       await addCucumberPreprocessorPlugin(on, config);
-
-      // Only initialize cypress-split if the required environment variables are present
-      // This prevents the error during configuration when env vars are not set yet
-      if (process.env.SPLIT === 'true' && process.env.CI_BUILD_ID) {
-        console.log('Initializing cypress-split plugin for parallel execution');
-        cypressSplit(on, config);
-      } else {
-        console.log('Skipping cypress-split initialization (missing environment variables)');
-      }
 
       // This is the file preprocessor for your feature files.
       on(
