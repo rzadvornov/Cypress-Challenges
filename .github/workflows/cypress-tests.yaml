@@ -26,7 +26,6 @@ jobs:
     - name: Run Cypress tests in parallel with Percy
       run: |
         docker run \
-          -e CYPRESS_RECORD_KEY="${{ secrets.CYPRESS_RECORD_KEY }}" \
           -e PERCY_TOKEN="${{ secrets.PERCY_TOKEN }}" \
           -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
           -e GITHUB_RUN_ID=$GITHUB_RUN_ID \
