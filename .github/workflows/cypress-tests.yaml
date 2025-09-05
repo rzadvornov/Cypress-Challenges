@@ -12,23 +12,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        containers: [1, 2, 3] # Cypress Cloud will split tests across these
+        containers: [1, 2, 3] # 3 parallel containers
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Build Docker image
-      run: docker build --no-cache -t cypress-cloud-image .
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
 
-    - name: Run Cypress tests in parallel with Cypress Cloud
-      run: |
-        docker run \
-          -e CI_BUILD_ID=${{ github.run_id }}-${{ github.run_attempt }} \
-          -e SPLIT_INDEX=${{ strategy.job-index }} \
-          -e CYPRESS_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }} \
-          -e ELECTRON_EXTRA_LAUNCH_ARGS="--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader" \
-          -e GITHUB_ACTIONS=true \
-          cypress-cloud-image
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Cypress tests in parallel
+      uses: cypress-io/github-action@v6
+      with:
+        record: true
+        parallel: true
+        group: "Machine ${{ strategy.job-index }}"
+        ci-build-id: ${{ github.run_id }}-${{ github.run_attempt }}
+        browser: chrome
+      env:
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        ELECTRON_EXTRA_LAUNCH_ARGS: "--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
