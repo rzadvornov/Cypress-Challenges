@@ -24,6 +24,7 @@ jobs:
       run: |
         docker run \
           -e CI_BUILD_ID=${{ github.run_id }}-${{ github.run_attempt }} \
+          -e SPLIT_INDEX=${{ strategy.job-index }} \
           -e CYPRESS_RECORD_KEY=${{ secrets.CYPRESS_RECORD_KEY }} \
           -e ELECTRON_EXTRA_LAUNCH_ARGS="--enable-unsafe-swiftshader --ignore-gpu-blocklist --use-gl=swiftshader" \
           -e GITHUB_ACTIONS=true \
