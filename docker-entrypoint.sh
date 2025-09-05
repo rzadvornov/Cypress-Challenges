@@ -5,8 +5,8 @@ set -e
 
 echo "Running Cypress tests in parallel with cypress-split"
 
-# The most reliable way to run a local executable is by using its full path.
-./node_modules/.bin/cypress-split run \
+# Use npx to run cypress-split (more reliable than direct path)
+npx cypress-split run \
   --ci-build-id "${GITHUB_RUN_ID}" \
   --parallel \
   --group "Machine ${SPLIT_MACHINE_INDEX}" \

@@ -8,7 +8,7 @@ WORKDIR /e2e
 COPY package*.json ./
 COPY .cypress-cucumber-preprocessorrc.json ./
 
-# Install project dependencies
+# Install project dependencies (including cypress-split)
 RUN npm ci
 
 # Copy test files
