@@ -8,7 +8,7 @@ WORKDIR /e2e
 COPY package*.json ./
 COPY .cypress-cucumber-preprocessorrc.json ./
 
-# Install project dependencies (including cypress-split)
+# Install project dependencies (REMOVED cypress-split)
 RUN npm ci
 
 # Copy test files
@@ -20,9 +20,6 @@ RUN groupadd -r cypress && useradd -r -g cypress -m -d /e2e cypress \
 
 # Switch to non-root user
 USER cypress
-
-# Verify cypress-split is installed
-RUN ls -la node_modules/.bin/ | grep cypress-split
 
 # Create an entrypoint script to handle environment variables properly
 COPY --chown=cypress:cypress docker-entrypoint.sh /e2e/docker-entrypoint.sh
