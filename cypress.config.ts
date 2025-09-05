@@ -34,7 +34,7 @@ export default defineConfig({
   e2e: {
     baseUrl: "https://practice.expandtesting.com",
     specPattern: "**/*.feature",
-    experimentalRunAllSpecs: true,
+    experimentalRunAllSpecs: false,
     video: true,
     screenshotOnRunFailure: true,
     testIsolation: true,
