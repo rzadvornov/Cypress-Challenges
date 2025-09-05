@@ -21,6 +21,9 @@ RUN groupadd -r cypress && useradd -r -g cypress -m -d /e2e cypress \
 # Switch to non-root user
 USER cypress
 
+# Verify cypress-split is installed
+RUN ls -la node_modules/.bin/ | grep cypress-split
+
 # Create an entrypoint script to handle environment variables properly
 COPY --chown=cypress:cypress docker-entrypoint.sh /e2e/docker-entrypoint.sh
 # Fix line endings to be compatible with Linux
