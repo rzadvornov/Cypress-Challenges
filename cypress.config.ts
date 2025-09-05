@@ -49,16 +49,18 @@ export default defineConfig({
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
       // CRITICAL: This MUST be the first line in your setupNodeEvents function.
-      // It registers all the necessary Cypress event handlers for the cucumber
-      // preprocessor. If another plugin runs before this, it can overwrite them,
-      // leading to state conflicts.
       await addCucumberPreprocessorPlugin(on, config);
 
-      // Add cypress-split plugin for parallel test execution
-      cypressSplit(on, config);
+      // Only initialize cypress-split if the required environment variables are present
+      // This prevents the error during configuration when env vars are not set yet
+      if (process.env.SPLIT === 'true' && process.env.CI_BUILD_ID) {
+        console.log('Initializing cypress-split plugin for parallel execution');
+        cypressSplit(on, config);
+      } else {
+        console.log('Skipping cypress-split initialization (missing environment variables)');
+      }
 
-      // This is the file preprocessor for your feature files. It correctly
-      // uses the esbuild plugin which is required for the cucumber preprocessor.
+      // This is the file preprocessor for your feature files.
       on(
         "file:preprocessor",
         createBundler({
@@ -67,7 +69,6 @@ export default defineConfig({
       );
 
       // This section is for custom tasks and event listeners.
-      // They are placed AFTER the cucumber preprocessor is fully set up.
       on("task", {
         createTestFile({ size, filename }) {
           const fs = require("fs");
