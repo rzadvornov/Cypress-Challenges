@@ -34,8 +34,8 @@ export default defineConfig({
   e2e: {
     baseUrl: "https://practice.expandtesting.com",
     specPattern: "**/*.feature",
-    experimentalRunAllSpecs: false,
-    video: false,
+    experimentalRunAllSpecs: true,
+    video: true,
     screenshotOnRunFailure: true,
     testIsolation: true,
     defaultCommandTimeout: 10000,
@@ -48,10 +48,9 @@ export default defineConfig({
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
-      // This is required for the preprocessor to be able to generate JSON reports after each run
+      // This is the most crucial step. Use the preprocessor from the cucumber plugin
+      // to wrap your bundler. This ensures the correct event handling order.
       await addCucumberPreprocessorPlugin(on, config);
-
-      // Add file preprocessor for Cucumber features
       on(
         "file:preprocessor",
         createBundler({
@@ -64,19 +63,15 @@ export default defineConfig({
         createTestFile({ size, filename }) {
           const fs = require("fs");
           const path = require("path");
-
-          const content = "x".repeat(size * 1024); // size in KB
+          const content = "x".repeat(size * 1024);
           const filePath = path.join(__dirname, "cypress/fixtures", filename);
-
           fs.writeFileSync(filePath, content);
           return filePath;
         },
-
         cleanupTestFiles() {
           const fs = require("fs");
           const path = require("path");
           const fixturesDir = path.join(__dirname, "cypress/fixtures");
-
           try {
             const files = fs.readdirSync(fixturesDir);
             files.forEach((file: string) => {
@@ -120,7 +115,6 @@ export default defineConfig({
           return launchOptions;
         }
       );
-
       return config;
     },
   },
