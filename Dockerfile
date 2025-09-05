@@ -17,19 +17,20 @@ RUN npm ci
 # Copy test files
 COPY . .
 
-# Set environment variables with defaults
-ARG CYPRESS_RECORD_KEY=""
-ARG PERCY_TOKEN=""
-ARG GITHUB_TOKEN=""
+# Set non-sensitive environment variables with defaults
 ARG PARALLEL=1
 ARG MACHINE=1
 
-# Expose environment variables
-ENV CYPRESS_RECORD_KEY=${CYPRESS_RECORD_KEY}
-ENV PERCY_TOKEN=${PERCY_TOKEN}
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+# Expose non-sensitive environment variables
 ENV CYPRESS_PARALLEL=${PARALLEL}
 ENV MACHINE_NUMBER=${MACHINE}
 
-# Command to run tests
+# Create a non-root user to run the tests
+RUN groupadd -r cypress && useradd -r -g cypress -m -d /e2e cypress \
+    && chown -R cypress:cypress /e2e
+
+# Switch to non-root user
+USER cypress
+
+# Command to run tests (secrets will be passed at runtime)
 CMD ["sh", "-c", "npx cypress run --record --parallel --ci-build-id ${GITHUB_RUN_ID} --group \"Cypress Parallel Tests\" --browser chrome || true"]
