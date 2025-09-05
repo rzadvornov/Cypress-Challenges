@@ -64,7 +64,7 @@ jobs:
           cypress/reports
           cypress/screenshots
           cypress/videos
-        if-no-files-found: ignore
+        if: always()
 
   publish-results:
     needs: cypress-tests
