@@ -48,16 +48,18 @@ export default defineConfig({
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
-      // Register the cucumber preprocessor plugin FIRST
+      // This is required for the preprocessor to be able to generate JSON reports after each run
       await addCucumberPreprocessorPlugin(on, config);
 
+      // Add file preprocessor for Cucumber features
       on(
         "file:preprocessor",
         createBundler({
           plugins: [createEsbuildPlugin(config)],
         })
       );
-      
+
+      // Add your custom tasks
       on("task", {
         createTestFile({ size, filename }) {
           const fs = require("fs");
@@ -95,7 +97,7 @@ export default defineConfig({
       on(
         "before:browser:launch",
         (
-          browser = {
+          browser: Cypress.Browser = {
             name: "",
             family: "chromium",
             channel: "",
@@ -106,19 +108,19 @@ export default defineConfig({
             isHeaded: false,
             isHeadless: false,
           },
-          launchOptions
+          launchOptions: Cypress.BeforeBrowserLaunchOptions
         ) => {
           if (browser.family === "chromium" && browser.name !== "electron") {
             launchOptions.args.push("--start-fullscreen");
             launchOptions.args.push("--guest");
-            return launchOptions;
           }
           if (browser.name === "electron") {
             launchOptions.preferences.fullscreen = true;
-            return launchOptions;
           }
+          return launchOptions;
         }
       );
+
       return config;
     },
   },
