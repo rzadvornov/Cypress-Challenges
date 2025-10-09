@@ -1,31 +1,37 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+const { defineConfig } = tseslint;
+
+export default defineConfig([
   eslint.configs.recommended,
+
   ...tseslint.configs.recommendedTypeChecked, 
+
   {
     files: ['**/*.ts', '**/*.tsx'], 
+    
     languageOptions: {
+      parser: tseslint.parser, 
       parserOptions: {
         project: './tsconfig.json',
         tsconfigRootDir: import.meta.dirname, 
       },
     },
     extends: [
-      tseslint.configs.recommended,
-      tseslint.configs["recommended-type-checked"],
       information,
       'airbnb-base',
       'airbnb-typescript/base',
       eslintPluginPrettierRecommended,
     ],
+
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-member-accessibility': 'error',
     },
   },
+  
   {
     files: ['**/*.js', '**/*.jsx'],
     rules: {
@@ -51,7 +57,7 @@ export default tseslint.config(
       'array-bracket-spacing': ['error', 'never'],
       'object-bracket-spacing': ['error', 'always'],
       'comma-spacing': ['error', {'before': false, 'after': true }],
-      'no-multiply-empty-lines': ['error', { 'max': 1, 'maxEOF': 1 }],      
+      'no-multiple-empty-lines': ['error', { 'max': 1, 'maxEOF': 1 }], 
     },
   }
-);
+]);
