@@ -20,7 +20,6 @@
     "cy:run:chrome": "npx cypress run --browser chrome",
     "cy:run:firefox": "npx cypress run --browser firefox",
     "cy:test": "npx cypress run --spec 'cypress/e2e/features/*.feature'",
-    "lint": "eslint.js",
     "test": "cypress run",
     "test:parallel": "cypress run --record --parallel",
     "cy:test:mobile": "npx cypress run --config viewportWidth=375,viewportHeight=667"
