@@ -1,0 +1,99 @@
+graph TB
+    subgraph "Test Framework"
+        CypressCore[Cypress Test Runner]
+        TestSuite[Test Suite Manager]
+        ConfigManager[Configuration Manager]
+    end
+    
+    subgraph "Test Organization"
+        E2ETests[E2E Test Specs]
+        ComponentTests[Component Tests]
+        APITests[API Integration Tests]
+        VisualTests[Visual Regression Tests]
+    end
+    
+    subgraph "Test Patterns"
+        PageObjects[Page Objects]
+        CustomCommands[Custom Commands]
+        Fixtures[Test Fixtures]
+        Helpers[Test Helpers]
+    end
+    
+    subgraph "Browser Automation"
+        BrowserDriver[Browser Driver]
+        DOMInteraction[DOM Interaction Layer]
+        NetworkInterception[Network Intercept]
+        Viewport[Viewport Controller]
+    end
+    
+    subgraph "API Testing"
+        HTTPRequests[HTTP Request Handler]
+        ResponseValidation[Response Validator]
+        MockServer[Mock Server]
+    end
+    
+    subgraph "Target Application"
+        WebApp[Web Application]
+        FrontendComponents[Frontend Components]
+        BackendAPI[Backend API]
+    end
+    
+    subgraph "Reporting & Debugging"
+        MochaReporter[Mocha Reporter]
+        Screenshots[Screenshot Capture]
+        Videos[Video Recording]
+        TestRetry[Test Retry Logic]
+    end
+    
+    subgraph "CI/CD Integration"
+        GitHubActions[GitHub Actions]
+        ParallelRuns[Parallel Execution]
+        Dashboard[Cypress Dashboard]
+    end
+    
+    ConfigManager --> CypressCore
+    CypressCore --> TestSuite
+    
+    TestSuite --> E2ETests
+    TestSuite --> ComponentTests
+    TestSuite --> APITests
+    TestSuite --> VisualTests
+    
+    E2ETests --> PageObjects
+    E2ETests --> CustomCommands
+    ComponentTests --> CustomCommands
+    APITests --> CustomCommands
+    
+    PageObjects --> Fixtures
+    CustomCommands --> Helpers
+    
+    E2ETests --> BrowserDriver
+    ComponentTests --> BrowserDriver
+    
+    BrowserDriver --> DOMInteraction
+    BrowserDriver --> NetworkInterception
+    BrowserDriver --> Viewport
+    
+    DOMInteraction --> WebApp
+    DOMInteraction --> FrontendComponents
+    NetworkInterception --> BackendAPI
+    
+    APITests --> HTTPRequests
+    HTTPRequests --> ResponseValidation
+    HTTPRequests --> BackendAPI
+    
+    NetworkInterception --> MockServer
+    
+    CypressCore --> MochaReporter
+    E2ETests --> Screenshots
+    E2ETests --> Videos
+    TestSuite --> TestRetry
+    
+    CypressCore --> GitHubActions
+    GitHubActions --> ParallelRuns
+    MochaReporter --> Dashboard
+    
+    style CypressCore fill:#17202c
+    style WebApp fill:#69d3a7
+    style Dashboard fill:#1b1e2e
+    style GitHubActions fill:#2088ff
